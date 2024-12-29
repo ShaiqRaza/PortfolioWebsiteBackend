@@ -1,15 +1,28 @@
-import express from 'express'
+import express from 'express';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import skillRoutes from '../routes/skillRoutes.js'
+import '../db/index.js'
+
 const app = express();
-import dotenv from 'dotenv'
-dotenv.config()
 
-import '../db/index.js'//database connection
+// Get the directory name of the current module
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+// Serve static files
+app.use(express.static(path.resolve(__dirname, 'public')));
 
-app.get('/', (req, res)=>{
-    res.send("Welcome to my application!!")
-})
+// Middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use('/skills', skillRoutes)
 
-const port = process.env.PORT || 3000;
-app.listen(port, ()=>{
-    console.log("App is running on port: ", port)
-})
+app.get('/', (req, res) => {
+  res.send("hello");
+});
+
+// Start the server
+const PORT = 3000;
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
+});

@@ -2,7 +2,7 @@ import mongoose from 'mongoose'
 import dotenv from 'dotenv'
 dotenv.config()
 
-mongoose.connect(`${process.env.DB_URI}/practice`)
+mongoose.connect(`${process.env.DB_URI}/khusham`)
 .then(()=>{
     console.log("dataBase connected Successfully");
 })
