@@ -1,7 +1,6 @@
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import skillRoutes from '../routes/skillRoutes.js'
 import '../db/index.js'
 
 const app = express();
@@ -12,9 +11,13 @@ const __dirname = path.dirname(__filename);
 // Serve static files
 app.use(express.static(path.resolve(__dirname, 'public')));
 
-// Middleware
+// general Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+//routes
+import skillRoutes from '../routes/skillRoutes.js'
+
 app.use('/skills', skillRoutes)
 
 app.get('/', (req, res) => {

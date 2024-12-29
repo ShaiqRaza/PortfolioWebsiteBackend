@@ -11,12 +11,13 @@ export const getAllSkills = async(req, res) =>{
 }
 
 export const createSkill = async(req, res) =>{
-    const [title, description] = req.body;
-    const existingSkill = await skillModel.find({title});
+    const {title, description} = req.body;
+    const existingSkill = await skillModel.findOne({title});
 
     if(existingSkill){
         return res.status(500).send(`${title} skill already exists`);
     }
+
     const newSkill = await skillModel.create({
         title,
         description
@@ -30,7 +31,7 @@ export const createSkill = async(req, res) =>{
 }
 
 export const updateSkill = async(req, res) =>{ 
-    const [title, description, id] = req.body;
+    const {title, description, id} = req.body;
     const existingSkill = await skillModel.find({_id:id});
 
     if(!existingSkill){
@@ -49,7 +50,7 @@ export const updateSkill = async(req, res) =>{
 }
 
 export const deleteSkill = async (req, res)=>{
-    const [title] = req.body;
+    const {title} = req.body;
     const existingSkill = await skillModel.find({title});
 
     if(!existingSkill){
