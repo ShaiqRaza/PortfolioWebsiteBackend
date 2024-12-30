@@ -5,10 +5,8 @@ import '../db/index.js'
 
 const app = express();
 
-// Get the directory name of the current module
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-// Serve static files
 app.use(express.static(path.resolve(__dirname, 'public')));
 
 // general Middleware

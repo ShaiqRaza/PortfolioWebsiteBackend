@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import skillModel from '../models/skillModel.js'
 
 export const getAllSkills = async(req, res) =>{
@@ -11,57 +12,81 @@ export const getAllSkills = async(req, res) =>{
 }
 
 export const createSkill = async(req, res) =>{
-    const {title, description} = req.body;
-    const existingSkill = await skillModel.findOne({title});
+    try{
+        const {title, description} = req.body;
+        const existingSkill = await skillModel.findOne({title});
 
-    if(existingSkill){
-        return res.status(500).send(`${title} skill already exists`);
-    }
+        if(existingSkill){
+            return res.status(500).send(`${title} skill already exists`);
+        }
 
-    const newSkill = await skillModel.create({
-        title,
-        description
-    })
-    .then((response)=>{
+        const newSkill = await skillModel.create({
+            title,
+            description
+        })
         res.status(200).json(response);
-    })
-    .catch((err)=>{
-        res.status(500).send("Something error happened! Can't create new skill document");
-    })
+    }
+    catch(err){
+        res.status(500).json({ 
+            message: "An error occurred while creating the skill.",
+            error: err.message 
+        });
+    }
 }
 
 export const updateSkill = async(req, res) =>{ 
-    const {title, description, id} = req.body;
-    const existingSkill = await skillModel.find({_id:id});
+    try{
+        const {title, description} = req.body;
+        const id = req.params.id;
 
-    if(!existingSkill){
-        return res.status(500).send(`Something error happened! Target skill document not exists`);
+        if(!id){
+            return res.status(500).send(`Something error happened! Can't update skill document`);
+        }
+
+        const existingSkill = await skillModel.findById(id);
+
+        if(!existingSkill){
+            return res.status(500).send(`Something error happened! Target skill document not exists`);
+        }
+
+        if (title) existingSkill.title = title;
+        if (description) existingSkill.description = description;
+
+        await existingSkill.save()
+        return res.status(200).json(existingSkill);
     }
-
-    existingSkill.description = description;
-    existingSkill.title = title;
-    await existingSkill.save()
-    .then((response)=>{
-        res.status(200).json(response);
-    })
-    .catch((err)=>{
-        res.status(500).send(`Something error happened! Can'ts update ${title} skill document`);
-    })
+    catch(err){
+        return res.status(500).json({ 
+            message: "An error occurred while updating the skill.",
+            error: err.message 
+        });
+    }
 }
 
 export const deleteSkill = async (req, res)=>{
-    const {title} = req.body;
-    const existingSkill = await skillModel.find({title});
+    try{
+        const id = req.params.id;
 
-    if(!existingSkill){
-        return res.status(504).send("The target skill to delete doesn't even exits.")
+        if (!id) {
+            return res.status(400).json({ message: "Skill ID is required for deletion." });
+        }
+
+        // if (!mongoose.Types.ObjectId.isValid(id)) {
+        //     return res.status(400).json({ message: "Invalid Skill ID format." });
+        // }
+
+        const deletedSkill = await skillModel.findByIdAndDelete(id);
+
+        if (!deletedSkill) {
+            return res.status(404).json({ message: "Skill not found or already deleted." });
+        }
+
+        return res.send("Skill document deleted successfully")
     }
-
-    await skillModel.deleteOne({title})
-    .then((response)=>{
-        return res.send(response)
-    })
-    .catch(()=>{
-        return res.status(400).send("Something error happened! Can't delete the skill document.")
-    })
+    catch(err){
+        return res.status(500).json({ 
+            message: "An error occurred while deleting the skill.",
+            error: err.message
+        });
+    }
 }
