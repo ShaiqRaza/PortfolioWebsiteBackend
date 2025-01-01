@@ -2,6 +2,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 import express from 'express';
+import cookieParser from 'cookie-parser';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import '../db/index.js';
@@ -13,6 +14,7 @@ const __dirname = path.dirname(__filename);
 app.use(express.static(path.resolve(__dirname, 'public')));
 
 // general Middleware
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
