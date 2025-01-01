@@ -23,6 +23,9 @@ export const createSkill = async(req, res) =>{
             return res.status(400).send(`${title} skill already exists`);
         }
 
+        if(!(title && description))
+            return res.status(400).json({ message: "All fields are required." });
+
         const newSkill = await skillModel.create({
             title,
             description
