@@ -1,7 +1,10 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import '../db/index.js'
+import '../db/index.js';
 
 const app = express();
 
@@ -14,18 +17,18 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 //routes
-import skillRoutes from '../routes/skillRoutes.js'
-import aboutRoutes from '../routes/aboutRoutes.js'
+import skillRoutes from '../routes/skillRoutes.js';
+import aboutRoutes from '../routes/aboutRoutes.js';
 
-app.use('/skills', skillRoutes)
-app.use('/about', aboutRoutes)
+app.use('/skills', skillRoutes);
+app.use('/about', aboutRoutes);
 
 app.get('/', (req, res) => {
   res.send("hello");
 });
 
 // Start the server
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });

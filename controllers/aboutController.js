@@ -1,14 +1,16 @@
+import dotenv from 'dotenv';
+dotenv.config();
 import aboutModel from "../models/aboutModel.js";
 import bcrypt from 'bcrypt';
 
 export const createAbout = async(req, res) => {
     try {
-        if (process.env.NODE_ENV === 'production')
+        if (process.env.NODE_ENV == 'production')
             return res.status(400).json({ message: "You are not allowed to create about in production environment" });
 
-        const { Intro, description, avatar, password } = req.body;
+        const { intro, description, avatar, password } = req.body;
 
-        if (!(Intro && description && avatar && password))
+        if (!(intro && description && avatar && password))
             return res.status(400).json({ message: "All fields are required." });
 
         const existingAbout = await aboutModel.find();
@@ -25,7 +27,7 @@ export const createAbout = async(req, res) => {
                     return res.status(500).json({ message: "Error occurred at hash generation.", error: err.message });
 
                 const newAbout = await aboutModel.create({
-                    Intro,
+                    intro,
                     description,
                     avatar,
                     password: hash

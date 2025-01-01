@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 const aboutSchema = mongoose.Schema({
-    Intro: {
+    intro: {
         type: String,
         required: true
     },
