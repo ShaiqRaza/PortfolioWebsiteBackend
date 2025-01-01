@@ -1,4 +1,4 @@
-import aboutModel from "../models/aboutModel";
+import aboutModel from "../models/aboutModel.js";
 import bcrypt from 'bcrypt';
 
 export const createAbout = async(req, res) => {

@@ -15,8 +15,10 @@ app.use(express.urlencoded({ extended: true }));
 
 //routes
 import skillRoutes from '../routes/skillRoutes.js'
+import aboutRoutes from '../routes/aboutRoutes.js'
 
 app.use('/skills', skillRoutes)
+app.use('/about', aboutRoutes)
 
 app.get('/', (req, res) => {
   res.send("hello");
