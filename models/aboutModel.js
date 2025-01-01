@@ -19,4 +19,5 @@ const aboutSchema = mongoose.Schema({
     },
 });
 
-export const aboutModel = mongoose.model('about', aboutSchema);
+const aboutModel = mongoose.model('about', aboutSchema);
+export default aboutModel;
