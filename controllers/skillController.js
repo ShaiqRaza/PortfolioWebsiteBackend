@@ -20,14 +20,14 @@ export const createSkill = async(req, res) =>{
         const existingSkill = await skillModel.findOne({title});
 
         if(existingSkill){
-            return res.status(500).send(`${title} skill already exists`);
+            return res.status(400).send(`${title} skill already exists`);
         }
 
         const newSkill = await skillModel.create({
             title,
             description
-        })
-        res.status(200).json(response);
+        });
+        res.status(201).json(newSkill);
     }
     catch(err){
         res.status(500).json({ 
@@ -53,13 +53,13 @@ export const updateSkill = async(req, res) =>{
         const existingSkill = await skillModel.findById(id);
 
         if(!existingSkill){
-            return res.status(500).json({ message: "Something error happened! Target skill document not found!" });
+            return res.status(404).json({ message: "Skill not found!" });
         }
 
         if (title) existingSkill.title = title;
         if (description) existingSkill.description = description;
 
-        await existingSkill.save()
+        await existingSkill.save();
         return res.status(200).json(existingSkill);
     }
     catch(err){
@@ -90,7 +90,7 @@ export const deleteSkill = async (req, res)=>{
 
         return res.status(200).json({
             message: "Skill document deleted successfully"
-        })
+        });
     }
     catch(err){
         return res.status(500).json({ 
