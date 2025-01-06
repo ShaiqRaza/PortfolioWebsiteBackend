@@ -8,9 +8,9 @@ export const createAbout = async(req, res) => {
         if (process.env.NODE_ENV == 'production')
             return res.status(400).json({ message: "You are not allowed to create about in production environment" });
 
-        const { intro, description, avatar } = req.body;
+        const { intro, description, avatar, password } = req.body;
 
-        if (!(intro && description && avatar))
+        if (!(intro && description && avatar && password))
             return res.status(400).json({ message: "All fields are required." });
 
         const existingAbout = await aboutModel.find();
@@ -30,6 +30,7 @@ export const createAbout = async(req, res) => {
                     intro,
                     description,
                     avatar,
+                    password: hash
                 });
 
                 res.status(201).json(newAbout);
