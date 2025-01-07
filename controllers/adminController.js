@@ -1,6 +1,7 @@
 import dotenv from 'dotenv'
 dotenv.config();
 import adminModel from '../models/adminModel.js';
+import bcrypt from 'bcrypt'
 
 export const createAdmin = async (req, res) =>{
     try{
@@ -15,13 +16,15 @@ export const createAdmin = async (req, res) =>{
         if(!(email && password))
             return res.status(504).json({message: "All fields are required"})
 
+        const salt = await bcrypt.genSalt(10);
+        const hash = await bcrypt.hash(password, salt);
+        
         const admin = await adminModel.create({
-            email,
-            password
+            password: hash,
+            email
         })
 
-        res.send("Admin is created successfully")
-
+        res.json({message: "Admin created successfully"})
     }
     catch(err){
         res.json({
