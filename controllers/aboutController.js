@@ -7,7 +7,8 @@ export const createAbout = async(req, res) => {
         if (process.env.NODE_ENV == 'production')
             return res.status(400).json({ message: "You are not allowed to create about in production environment" });
 
-        const { intro, description, avatar } = req.body;
+        const { intro, description } = req.body;
+        const avatar = req.file ? req.file.path : null;
 
         if (!(intro && description && avatar))
             return res.status(400).json({ message: "All fields are required." });
