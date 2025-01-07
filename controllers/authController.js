@@ -40,13 +40,8 @@ export const loginAdmin = async(req, res) => {
 
 export const logoutAdmin = async(req, res) => {
     try{
-        const adminCookie = req.cookies.admin;
-        if(adminCookie){
-            res.clearCookie('admin', {httpOnly:true});
-            return res.json({message: "Logged out successfully!"})
-        }
-        else
-            return res.json({message: "You are not logged in yet!"})
+        res.clearCookie('admin', {httpOnly:true});
+        return res.json({message: "Logged out successfully!"})
     }
     catch(err){
         res.status(500).json({
