@@ -1,17 +1,22 @@
 import dotenv from 'dotenv';
 dotenv.config();
-import aboutModel from "../models/aboutModel.js";
+import adminModel from "../models/adminModel.js";
 import bcrypt from 'bcrypt';
 
 export const loginAdmin = async(req, res) => {
     try{
-        const {password} = req.body;
-        if(!password)
-            return res.json({message: "Password is Required"})
-        const about = await aboutModel.findOne();
-        if(!about)
-            return res.status(404).json({ message: "Admin not found!" });
-        const hash = about.password;
+        const admin = await adminModel.findOne();
+        if(!admin)
+            return res.status(404).json({ message: "There is no admin, you can't login" });
+        const {password, email} = req.body;
+        if(!password || !email)
+            return res.json({message: "All fields are required"})
+
+        if(email != admin.email )
+            return res.status(500).json({ message: "Incorrect email or password"})
+
+        // first of all, I stored the hash of the actual admin's password so that I can compare it with the entered password for login
+        const hash = admin.password;
         bcrypt.compare(password, hash, function(err, result) {
             if(err)
                 return res.status(500).json({message: "Error occured in hash comparing", error: err.message})
@@ -21,7 +26,7 @@ export const loginAdmin = async(req, res) => {
             }
             else
                 res.json({
-                    message: "Password is Incorrect!"
+                    message: "Incorrect email or password"
                 })
         });
     }
