@@ -4,7 +4,7 @@ export const isLoggedin = (req, res, next)=>{
     try{
         const authCookie = req.cookies.admin;
         if(authCookie == 'success'){
-            next();
+            return next();
         }
         return res.json({message:"Admin is not logged in"})
     }

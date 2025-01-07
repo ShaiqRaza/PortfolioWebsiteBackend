@@ -32,3 +32,27 @@ export const createAbout = async(req, res) => {
         });
     }
 }
+
+export const updateAbout = async(req, res)=>{
+    try{
+        const {intro, description, avatar} = req.body;
+        if(!(intro || description || avatar))
+            return res.status(500).json({message: "Nothing to change!"});
+        const prevAbout = await aboutModel.findOne();
+
+        if(!prevAbout)
+            return res.status(500).json({ message: "About section is not created yet"})
+
+        if(intro) prevAbout.intro = intro;
+        if(description) prevAbout.description = description;
+        if(avatar) prevAbout.avatar = avatar;
+        await prevAbout.save();
+        return res.status(200).send("About updated successfully")
+    }
+    catch(err){
+        res.status(500).json({ 
+            message: "An error occurred while updating the about.",
+            error: err.message 
+        });
+    }
+}
