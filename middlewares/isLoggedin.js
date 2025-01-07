@@ -9,7 +9,7 @@ export const isLoggedin = (req, res, next)=>{
         return res.json({message:"Admin is not logged in"})
     }
     catch(err){
-        res.json({
+        res.status(504).json({
             message: "Something error occured in cookie getting",
             error: err.message
         })
