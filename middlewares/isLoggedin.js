@@ -7,8 +7,10 @@ import adminModel from '../models/adminModel.js';
 export const isLoggedin = async (req, res, next)=>{
     try{
         const authCookie = req.cookies.admin;
+        if(!authCookie)
+            return res.json({message:"Admin is not logged in"})
         const decoded = jwt.verify (authCookie, process.env.JWT_SECRET);
-        const admin = await adminModel.findOne({email:decoded})
+        const admin = await adminModel.findOne({email:decoded.email})
         if(admin){
             return next();
         }
