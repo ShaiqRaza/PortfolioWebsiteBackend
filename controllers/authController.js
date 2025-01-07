@@ -2,6 +2,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 import adminModel from "../models/adminModel.js";
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken'
 
 export const loginAdmin = async(req, res) => {
     try{
@@ -15,20 +16,14 @@ export const loginAdmin = async(req, res) => {
         if(email != admin.email )
             return res.status(500).json({ message: "Incorrect email or password"})
 
-        // first of all, I stored the hash of the actual admin's password so that I can compare it with the entered password for login
-        const hash = admin.password;
-        bcrypt.compare(password, hash, function(err, result) {
-            if(err)
-                return res.status(500).json({message: "Error occured in hash comparing", error: err.message})
-            if(result){
-                res.cookie('admin', "success", {httpOnly: true});
-                return res.status(200).json({ message: "Login successful!" });
-            }
-            else
-                res.json({
-                    message: "Incorrect email or password"
-                })
-        });
+        const isMatch = await bcrypt.compare(password, admin.password);
+        if (!isMatch)
+            return res.status(401).json({ message: "Incorrect email or password" });
+
+        const token = jwt.sign({email}, process.env.JWT_SECRET, {expiresIn: 60*60*24});
+
+        res.cookie('admin', token, {httpOnly: true});
+        return res.status(200).json({ message: "Login successful!" });
     }
     catch(err){
         res.status(500).json({
