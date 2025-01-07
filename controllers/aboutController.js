@@ -56,3 +56,18 @@ export const updateAbout = async(req, res)=>{
         });
     }
 }
+
+export const getAbout = async(req, res)=>{
+    try{
+        const about = await aboutModel.findOne();
+        if(!about)
+            return res.status(500).json({ message: "About section is empty yet!"})
+        return res.send(about)
+    }
+    catch(err){
+        res.status(500).json({ 
+            message: "An error occurred while getting the about.",
+            error: err.message 
+        });
+    }
+}
