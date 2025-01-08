@@ -6,7 +6,7 @@ import { imageUpload, imageDelete } from '../utils/uploadHandlers.js';
 export const createAbout = async(req, res) => {
     try {
         if (process.env.NODE_ENV == 'production')
-            return res.status(400).json({ message: "You are not allowed to create about in production environment" });
+            return res.status(400).json({ message: "You are not allowed to create about." });
 
         const { intro, description } = req.body;
         const uploadedFile = req.file ? req.file : null;
@@ -45,19 +45,21 @@ export const updateAbout = async(req, res)=>{
         const uploadedFile = req.file;
         if(!(intro || description || uploadedFile))
             return res.status(500).json({message: "Nothing to change!"});
-        const prevAbout = await aboutModel.findOne();
 
+        const prevAbout = await aboutModel.findOne();
         if(!prevAbout)
             return res.status(500).json({ message: "About section is not created yet"})
 
-        const prevAvatarBuffer = await fetch(prevAbout.avatar).then(res => res.buffer());
+        const prevAvatarBuffer = await fetch(prevAbout.avatar)
+        .then(response => response.arrayBuffer())
+        .then(buffer => Buffer.from(buffer));
 
         if((intro == prevAbout.intro || !intro) && (description == prevAbout.description || !description) && (!uploadedFile || uploadedFile.buffer.equals(prevAvatarBuffer)))
             return res.json({message: "Nothing to update!"});
 
-        if(intro != prevAbout.intro) prevAbout.intro = intro;
-        if(description != prevAbout.description) prevAbout.description = description;
-        if( uploadedFile?.buffer?.equals(prevAvatarBuffer) ){
+        if(intro != prevAbout.intro && intro) prevAbout.intro = intro;
+        if(description != prevAbout.description && description) prevAbout.description = description;
+        if( uploadedFile && !uploadedFile.buffer.equals(prevAvatarBuffer) ){
             //delete previous image from cloudinary
             await imageDelete(prevAbout.avatar_id);
             const avatar = await imageUpload(uploadedFile);
