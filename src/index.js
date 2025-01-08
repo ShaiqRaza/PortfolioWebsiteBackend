@@ -22,12 +22,10 @@ app.use(express.urlencoded({ extended: true }));
 import skillRoutes from '../routes/skillRoutes.js';
 import aboutRoutes from '../routes/aboutRoutes.js';
 import authRoutes from '../routes/authRoutes.js'
-import adminRoutes from '../routes/adminRoutes.js'
 
-app.use('/skill', skillRoutes);
+app.use('/skills', skillRoutes);
 app.use('/about', aboutRoutes);
 app.use('/auth', authRoutes);
-app.use('/admin', adminRoutes);
 
 app.get('/', (req, res) => {
   res.send("hello");
