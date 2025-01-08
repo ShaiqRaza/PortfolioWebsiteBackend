@@ -20,7 +20,7 @@ export const createSkill = async(req, res) =>{
         const existingSkill = await skillModel.findOne({title});
 
         if(existingSkill){
-            return res.status(400).send(`${title} skill already exists`);
+            return res.status(400).json({message: `${title} skill already exists`});
         }
 
         if(!(title && description))
@@ -48,16 +48,19 @@ export const updateSkill = async(req, res) =>{
         if(!id){
             return res.status(400).json({ message: "Skill ID is required for updating." });
         }
-
+        
         if (!mongoose.Types.ObjectId.isValid(id)) {
             return res.status(400).json({ message: "Invalid Skill ID format." });
         }
-
+        
         const existingSkill = await skillModel.findById(id);
-
+        
         if(!existingSkill){
             return res.status(404).json({ message: "Skill not found!" });
         }
+        
+        if((!title || title == existingSkill.title) && (!description || description == existingSkill.description))
+            return res.status(400).json({ message: "Nothing to update." });
 
         if (title) existingSkill.title = title;
         if (description) existingSkill.description = description;
