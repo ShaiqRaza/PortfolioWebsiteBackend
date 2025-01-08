@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 dotenv.config();
 import aboutModel from "../models/aboutModel.js";
-import { imageUpload } from '../utils/uploadHandlers.js';
+import { imageUpload, imageDelete } from '../utils/uploadHandlers.js';
 
 export const createAbout = async(req, res) => {
     try {
@@ -50,12 +50,20 @@ export const updateAbout = async(req, res)=>{
         if(!prevAbout)
             return res.status(500).json({ message: "About section is not created yet"})
 
-        if(intro) prevAbout.intro = intro;
-        if(description) prevAbout.description = description;
-        if(uploadedFile){
+        const prevAvatarBuffer = await fetch(prevAbout.avatar).then(res => res.buffer());
+
+        if((intro == prevAbout.intro || !intro) && (description == prevAbout.description || !description) && !uploadedFile?.buffer?.equals(prevAvatarBuffer))
+            return res.json({message: "Nothing to update!"});
+
+        if(intro != prevAbout.intro) prevAbout.intro = intro;
+        if(description != prevAbout.description) prevAbout.description = description;
+        if( uploadedFile?.buffer?.equals(prevAvatarBuffer) ){
+            //delete previous image from cloudinary
+            await imageDelete(prevAbout.avatar_id);
             const avatar = await imageUpload(uploadedFile);
             prevAbout.avatar = avatar.secure_url;
             prevAbout.avatar_id = avatar.public_id;
+
         }
         await prevAbout.save();
         return res.status(200).send("About updated successfully")

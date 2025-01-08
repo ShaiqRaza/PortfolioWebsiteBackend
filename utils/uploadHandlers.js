@@ -17,3 +17,19 @@ export async function imageUpload(file) {
       throw new Error(`Image upload failed: ${err.message}`);
     }
 }
+
+export async function imageDelete(public_id) {
+    try{
+      if(!public_id)
+        throw new Error("no image id provided to delete");
+      const res = await cloudinary.uploader.destroy(public_id);
+
+      if (res.result === 'ok')
+        return res.result;
+      else
+          throw new Error('Failed to delete image');
+    }
+    catch(err){
+      throw new Error(`Image delete failed: ${err.message}`);
+    }
+}
