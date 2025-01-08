@@ -52,7 +52,7 @@ export const updateAbout = async(req, res)=>{
 
         const prevAvatarBuffer = await fetch(prevAbout.avatar).then(res => res.buffer());
 
-        if((intro == prevAbout.intro || !intro) && (description == prevAbout.description || !description) && !uploadedFile?.buffer?.equals(prevAvatarBuffer))
+        if((intro == prevAbout.intro || !intro) && (description == prevAbout.description || !description) && (!uploadedFile || uploadedFile.buffer.equals(prevAvatarBuffer)))
             return res.json({message: "Nothing to update!"});
 
         if(intro != prevAbout.intro) prevAbout.intro = intro;
