@@ -36,13 +36,16 @@ export const createAbout = async(req, res) => {
 
 export const updateAbout = async(req, res)=>{
     try{
-        const {intro, description, avatar} = req.body;
+        const {intro, description} = req.body;
+        const avatar = req.file;
         if(!(intro || description || avatar))
             return res.status(500).json({message: "Nothing to change!"});
         const prevAbout = await aboutModel.findOne();
 
         if(!prevAbout)
             return res.status(500).json({ message: "About section is not created yet"})
+
+        console.log(avatar)
 
         if(intro) prevAbout.intro = intro;
         if(description) prevAbout.description = description;
