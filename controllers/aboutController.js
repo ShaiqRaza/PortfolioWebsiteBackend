@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 dotenv.config();
 import aboutModel from "../models/aboutModel.js";
+import { imageUpload } from '../utils/uploadHandlers.js';
 
 export const createAbout = async(req, res) => {
     try {
@@ -8,7 +9,7 @@ export const createAbout = async(req, res) => {
             return res.status(400).json({ message: "You are not allowed to create about in production environment" });
 
         const { intro, description } = req.body;
-        const avatar = req.file ? req.file.path : null;
+        const avatar = req.file ? req.file : null;
 
         if (!(intro && description && avatar))
             return res.status(400).json({ message: "All fields are required." });
@@ -18,10 +19,13 @@ export const createAbout = async(req, res) => {
         if (existingAbout.length > 0)
             return res.status(400).json({ message: "About already exists" });
 
+        //image upload to cloudinary
+        const uploadedFile = await imageUpload(req.file);
+
         const newAbout = await aboutModel.create({
             intro,
             description,
-            avatar
+            avatar: uploadedFile.secure_url
         });
 
         res.status(201).json(newAbout);       
