@@ -13,6 +13,10 @@ const aboutSchema = mongoose.Schema({
         type: String,
         required: true
     },
+    avatar_id: {
+        type: String,
+        required: true
+    }
 });
 
 const aboutModel = mongoose.model('about', aboutSchema);

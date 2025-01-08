@@ -25,7 +25,8 @@ export const createAbout = async(req, res) => {
         const newAbout = await aboutModel.create({
             intro,
             description,
-            avatar: avatar.secure_url
+            avatar: avatar.secure_url,
+            avatar_id: avatar.public_id
         });
 
         res.status(201).json(newAbout);       
@@ -54,6 +55,7 @@ export const updateAbout = async(req, res)=>{
         if(uploadedFile){
             const avatar = await imageUpload(uploadedFile);
             prevAbout.avatar = avatar.secure_url;
+            prevAbout.avatar_id = avatar.public_id;
         }
         await prevAbout.save();
         return res.status(200).send("About updated successfully")
