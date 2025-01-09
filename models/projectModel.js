@@ -12,10 +12,18 @@ const projectSchema = mongoose.Schema({
     //video and images are not required
     images: [
         {
-            type: String,
+            image: {
+                type: String,
+            },
+            image_id: {
+                type: String,
+            }
         }
     ],
     video: {
+        type: String
+    },
+    video_id: {
         type: String
     }
 });
