@@ -23,11 +23,13 @@ import skillRoutes from '../routes/skillRoutes.js';
 import aboutRoutes from '../routes/aboutRoutes.js';
 import authRoutes from '../routes/authRoutes.js'
 import adminRoutes from '../routes/adminRoutes.js'
+import projectRoutes from '../routes/projectRoutes.js'
 
 app.use('/skills', skillRoutes);
 app.use('/about', aboutRoutes);
 app.use('/auth', authRoutes);
 app.use('/admin', adminRoutes);
+app.use('/project', projectRoutes);
 
 app.get('/', (req, res) => {
   res.send("hello");

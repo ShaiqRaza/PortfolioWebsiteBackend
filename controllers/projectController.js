@@ -18,8 +18,10 @@ export const getAllProjects = async(req, res) =>{
 export const createProject = async(req, res) =>{
     try{
         const {title, description} = req.body;
+        console.log(title, description)
         if(!(title && description))
-            return res.status(400).json({ message: "required fields are not given." });
+            return res.status(400).json({ message: "Required fields are not given." });
+
 
         const {images} = req.files;
         const {video} = req.file;
