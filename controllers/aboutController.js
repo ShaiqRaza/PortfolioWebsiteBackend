@@ -2,6 +2,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 import aboutModel from "../models/aboutModel.js";
 import { imageUpload, imageDelete } from '../utils/uploadHandlers.js';
+import fs from "fs";
 
 export const createAbout = async(req, res) => {
     try {
@@ -44,33 +45,31 @@ export const updateAbout = async(req, res)=>{
         const {intro, description} = req.body;
         const uploadedFile = req.file;
         if(!(intro || description || uploadedFile))
-            return res.status(500).json({message: "Nothing to change!"});
-
+            return res.status(500).json({message: "Nothing to update!"});
+        
         const prevAbout = await aboutModel.findOne();
         if(!prevAbout)
             return res.status(500).json({ message: "About section is not created yet"})
 
-        const prevAvatarBuffer = await fetch(prevAbout.avatar)
-        .then(response => response.arrayBuffer())
-        .then(buffer => Buffer.from(buffer));
-
-        if((intro == prevAbout.intro || !intro) && (description == prevAbout.description || !description) && (!uploadedFile || uploadedFile.buffer.equals(prevAvatarBuffer)))
+        if((intro == prevAbout.intro || !intro) && (description == prevAbout.description || !description) && (!uploadedFile))
             return res.json({message: "Nothing to update!"});
 
         if(intro != prevAbout.intro && intro) prevAbout.intro = intro;
         if(description != prevAbout.description && description) prevAbout.description = description;
-        if( uploadedFile && !uploadedFile.buffer.equals(prevAvatarBuffer) ){
+        if( uploadedFile ){
             //delete previous image from cloudinary
             await imageDelete(prevAbout.avatar_id);
             const avatar = await imageUpload(uploadedFile);
             prevAbout.avatar = avatar.secure_url;
             prevAbout.avatar_id = avatar.public_id;
-
+            fs.unlinkSync(uploadedFile.path);
         }
         await prevAbout.save();
         return res.status(200).send("About updated successfully")
     }
     catch(err){
+        if(uploadedFile)
+            fs.unlinkSync(uploadedFile.path);
         res.status(500).json({ 
             message: "An error occurred while updating the about.",
             error: err.message 
