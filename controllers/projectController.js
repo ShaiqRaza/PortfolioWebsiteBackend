@@ -26,10 +26,7 @@ export const createProject = async(req, res) =>{
         const {videos} = req.files;
 
         let uploadedImages = [];
-        let uploadedVideo = null;
-
-        console.log(videos);    
-        console.log(images);    
+        let uploadedVideo = null;  
 
         if(images)
             uploadedImages = await Promise.all(images.map(async (image) => {
