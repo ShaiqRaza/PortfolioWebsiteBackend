@@ -1,19 +1,21 @@
 import cloudinary from "../config/cloudinaryConfig.js";
+import fs from "fs";
 
-export async function imageUpload(file) {
+export async function imageUpload(filePath) {
     try{
         if (!file) 
           throw new Error("No image provided to upload");
 
-        const b64 = Buffer.from(file.buffer).toString("base64");
-        let dataURI = "data:" + file.mimetype + ";base64," + b64;
-
-        const res = await cloudinary.uploader.upload(dataURI, {
+        const res = await cloudinary.uploader.upload(filePath, {
           resource_type: "image",
         });
+
+        fs.unlinkSync(filePath);
+
         return res;
     }
     catch(err){
+      fs.unlinkSync(filePath);
       throw new Error(`Image upload failed: ${err.message}`);
     }
 }
@@ -34,21 +36,20 @@ export async function imageDelete(public_id) {
     }
 }
 
-export async function videoUpload(file) {
-  try{
-      if (!file) 
-        throw new Error("No Video provided to upload");
+export async function videoUpload(filePath) {
+  try {
+    // Upload the video from the local file path
+    const result = await cloudinary.uploader.upload(filePath, {
+      resource_type: "video",
+    });
 
-      const b64 = Buffer.from(file.buffer).toString("base64");
-      let dataURI = "data:" + file.mimetype + ";base64," + b64;
+    // Remove the file from the local storage after upload
+    fs.unlinkSync(filePath);
 
-      const res = await cloudinary.uploader.upload(dataURI, {
-        resource_type: "video",
-        timeout: 300000,
-      });
-      return res;
-  }
-  catch(err){
+    return result;
+  } catch (err) {
+    // Remove the file if there's an error
+    fs.unlinkSync(filePath);
     throw new Error(`Video upload failed: ${JSON.stringify(err)}`);
   }
 }
