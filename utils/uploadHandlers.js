@@ -39,8 +39,8 @@ export async function imageDelete(public_id) {
 export async function videoUpload(filePath) {
   try {
     if (!filePath) 
-      throw new Error("No image provided to upload");
-    
+      throw new Error("No video provided to upload");
+
     // Upload the video from the local file path
     const result = await cloudinary.uploader.upload(filePath, {
       resource_type: "video",
