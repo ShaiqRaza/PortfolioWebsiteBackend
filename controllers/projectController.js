@@ -18,37 +18,44 @@ export const getAllProjects = async(req, res) =>{
 export const createProject = async(req, res) =>{
     try{
         const {title, description} = req.body;
-        console.log(title, description)
         if(!(title && description))
             return res.status(400).json({ message: "Required fields are not given." });
 
 
         const {images} = req.files;
-        const {video} = req.file;
+        const {videos} = req.files;
 
-        const uploadedImages = Promise.all(images.map(async (image) => {
-            const uploadedImage = await imageUpload(image);
-            return {
-                image: uploadedImage.secure_url,
-                image_id: uploadedImage.public_id
-            }
-        }));
+        let uploadedImages = [];
+        let uploadedVideo = null;
 
-        const uploadedVideo = await videoUpload(video);
+        console.log(videos);    
+        console.log(images);    
+
+        if(images)
+            uploadedImages = await Promise.all(images.map(async (image) => {
+                const uploadedImage = await imageUpload(image);
+                return {
+                    image: uploadedImage.secure_url,
+                    image_id: uploadedImage.public_id
+                }
+            }));
+
+        if(videos)
+            uploadedVideo = await videoUpload(videos[0]);
 
         const newProject = await projectModel.create({
             title,
             description,
             images: uploadedImages,
-            video: uploadedVideo.secure_url,
-            video_id: uploadedVideo.public_id
+            video: uploadedVideo?.secure_url || null,
+            video_id: uploadedVideo?.public_id || null
         });
 
         res.status(201).json(newProject);
     }
     catch(err){
         res.status(500).json({            
-            message:"Something error happened! Cn't create new project",
+            message:"Something error happened! Can't create new project",
             error: err.message
         });
     }

@@ -44,11 +44,12 @@ export async function videoUpload(file) {
 
       const res = await cloudinary.uploader.upload(dataURI, {
         resource_type: "video",
+        timeout: 300000,
       });
       return res;
   }
   catch(err){
-    throw new Error(`Video upload failed: ${err.message}`);
+    throw new Error(`Video upload failed: ${JSON.stringify(err)}`);
   }
 }
 
