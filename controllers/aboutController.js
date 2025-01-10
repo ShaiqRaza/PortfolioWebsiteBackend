@@ -2,23 +2,31 @@ import dotenv from 'dotenv';
 dotenv.config();
 import aboutModel from "../models/aboutModel.js";
 import { imageUpload, imageDelete } from '../utils/uploadHandlers.js';
-import fs from "fs";
+import fs from "fs/promises";
 
 export const createAbout = async(req, res) => {
     try {
-        if (process.env.NODE_ENV == 'production')
-            return res.status(400).json({ message: "You are not allowed to create about." });
-
+        
         const { intro, description } = req.body;
         const uploadedFile = req.file ? req.file : null;
 
-        if (!(intro && description && uploadedFile))
+        if (!(intro && description && uploadedFile)){
+            if(uploadedFile)
+                await fs.unlinkSync(uploadedFile.path);
             return res.status(400).json({ message: "All fields are required." });
+        }
+
+        if (process.env.NODE_ENV == 'production'){
+            await fs.unlinkSync(uploadedFile.path);
+            return res.status(400).json({ message: "You are not allowed to create about." });
+        }
 
         const existingAbout = await aboutModel.find();
 
-        if (existingAbout.length > 0)
+        if (existingAbout.length > 0){
+            await fs.unlinkSync(uploadedFile.path);
             return res.status(400).json({ message: "About already exists" });
+        }
 
         //image upload to cloudinary
         const avatar = await imageUpload(req.file);
@@ -30,9 +38,12 @@ export const createAbout = async(req, res) => {
             avatar_id: avatar.public_id
         });
 
+        await fs.unlinkSync(uploadedFile.path);
         res.status(201).json(newAbout);       
 
     } catch (err) {
+        if(uploadedFile)
+            await fs.unlinkSync(uploadedFile.path);
         res.status(500).json({ 
             message: "An error occurred while creating the about.",
             error: err.message 
