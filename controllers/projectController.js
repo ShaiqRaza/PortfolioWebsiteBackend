@@ -33,7 +33,7 @@ export const createProject = async(req, res) =>{
 
         if(images)
             uploadedImages = await Promise.all(images.map(async (image) => {
-                const uploadedImage = await imageUpload(image);
+                const uploadedImage = await imageUpload(image.path);
                 return {
                     image: uploadedImage.secure_url,
                     image_id: uploadedImage.public_id
@@ -41,7 +41,7 @@ export const createProject = async(req, res) =>{
             }));
 
         if(videos)
-            uploadedVideo = await videoUpload(videos[0]);
+            uploadedVideo = await videoUpload(videos[0].path);
 
         const newProject = await projectModel.create({
             title,

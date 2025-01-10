@@ -3,7 +3,7 @@ import fs from "fs";
 
 export async function imageUpload(filePath) {
     try{
-        if (!file) 
+        if (!filePath) 
           throw new Error("No image provided to upload");
 
         const res = await cloudinary.uploader.upload(filePath, {
@@ -38,6 +38,9 @@ export async function imageDelete(public_id) {
 
 export async function videoUpload(filePath) {
   try {
+    if (!filePath) 
+      throw new Error("No image provided to upload");
+    
     // Upload the video from the local file path
     const result = await cloudinary.uploader.upload(filePath, {
       resource_type: "video",
