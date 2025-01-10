@@ -1,35 +1,30 @@
 import cloudinary from "../config/cloudinaryConfig.js";
-import fs from "fs";
+import fs from "fs/promises";
 
 export async function imageUpload(filePath) {
     try{
-        if (!filePath) 
-          throw new Error("No image provided to upload");
-
         const res = await cloudinary.uploader.upload(filePath, {
           resource_type: "image",
         });
 
-        fs.unlinkSync(filePath);
+        await fs.unlink(filePath);
 
         return res;
     }
     catch(err){
-      fs.unlinkSync(filePath);
+      await fs.unlink(filePath);
       throw new Error(`Image upload failed: ${err.message}`);
     }
 }
 
 export async function imageDelete(public_id) {
     try{
-      if(!public_id)
-        throw new Error("no image id provided to delete");
       const res = await cloudinary.uploader.destroy(public_id);
 
-      if (res.result === 'ok')
+      if (res.result == 'ok' || res.result == 'not found')
         return res.result;
       else
-          throw new Error('Failed to delete image');
+          throw new Error(`Failed to delete image: ${res.result}`);
     }
     catch(err){
       throw new Error(`Image delete failed: ${err.message}`);

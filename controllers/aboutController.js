@@ -29,7 +29,7 @@ export const createAbout = async(req, res) => {
         }
 
         //image upload to cloudinary
-        const avatar = await imageUpload(req.file);
+        const avatar = await imageUpload(uploadedFile.path);
 
         const newAbout = await aboutModel.create({
             intro,
@@ -38,12 +38,10 @@ export const createAbout = async(req, res) => {
             avatar_id: avatar.public_id
         });
 
-        await fs.unlink(uploadedFile.path);
+        //await fs.unlink(uploadedFile.path);
         res.status(201).json(newAbout);       
 
     } catch (err) {
-        if(uploadedFile)
-            await fs.unlink(uploadedFile.path);
         res.status(500).json({ 
             message: "An error occurred while creating the about.",
             error: err.message 
@@ -56,7 +54,7 @@ export const updateAbout = async(req, res)=>{
         const {intro, description} = req.body;
         const uploadedFile = req.file;
         if(!(intro || description || uploadedFile))
-            return res.status(500).json({message: "Nothing to update!"});
+            return res.status(500).json({message: "Nothing to change!"});
         
         const prevAbout = await aboutModel.findOne();
         if(!prevAbout)
@@ -70,7 +68,7 @@ export const updateAbout = async(req, res)=>{
         if( uploadedFile ){
             //delete previous image from cloudinary
             await imageDelete(prevAbout.avatar_id);
-            const avatar = await imageUpload(uploadedFile);
+            const avatar = await imageUpload(uploadedFile.path);
             prevAbout.avatar = avatar.secure_url;
             prevAbout.avatar_id = avatar.public_id;
             await fs.unlink(uploadedFile.path);
@@ -79,8 +77,6 @@ export const updateAbout = async(req, res)=>{
         return res.status(200).send("About updated successfully")
     }
     catch(err){
-        if(uploadedFile)
-            await fs.unlink(uploadedFile.path);
         res.status(500).json({ 
             message: "An error occurred while updating the about.",
             error: err.message 
