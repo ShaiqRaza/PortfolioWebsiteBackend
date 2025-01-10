@@ -38,7 +38,7 @@ export const createAbout = async(req, res) => {
         });
 
         await fs.unlink(uploadedFile.path);
-        res.status(201).json(newAbout);       
+        res.status(201).send(newAbout);       
 
     } catch (err) {
         if(req.file)
@@ -55,7 +55,7 @@ export const updateAbout = async(req, res)=>{
         const {intro, description} = req.body;
         const uploadedFile = req.file;
         if(!(intro || description || uploadedFile))
-            return res.status(500).json({message: "Nothing to change!"});
+            return res.status(500).json({message: "Nothing to update!"});
         
         const prevAbout = await aboutModel.findOne();
         if(!prevAbout){
@@ -78,7 +78,7 @@ export const updateAbout = async(req, res)=>{
         }
         await prevAbout.save();
         await fs.unlink(uploadedFile.path);
-        return res.status(200).send("About updated successfully")
+        return res.status(200).send(prevAbout);
     }
     catch(err){
         if(req.file)
