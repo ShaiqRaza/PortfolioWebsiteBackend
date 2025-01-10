@@ -5,10 +5,9 @@ import { imageUpload, imageDelete } from '../utils/uploadHandlers.js';
 import fs from "fs/promises";
 
 export const createAbout = async(req, res) => {
-    try {
-        
-        const { intro, description } = req.body;
+    try {       
         const uploadedFile = req.file ? req.file : null;
+        const { intro, description } = req.body;
 
         if (!(intro && description && uploadedFile)){
             if(uploadedFile)
@@ -38,10 +37,12 @@ export const createAbout = async(req, res) => {
             avatar_id: avatar.public_id
         });
 
-        //await fs.unlink(uploadedFile.path);
+        await fs.unlink(uploadedFile.path);
         res.status(201).json(newAbout);       
 
     } catch (err) {
+        if(req.file)
+            await fs.unlink(req.file.path);
         res.status(500).json({ 
             message: "An error occurred while creating the about.",
             error: err.message 
@@ -57,8 +58,11 @@ export const updateAbout = async(req, res)=>{
             return res.status(500).json({message: "Nothing to change!"});
         
         const prevAbout = await aboutModel.findOne();
-        if(!prevAbout)
+        if(!prevAbout){
+            if(uploadedFile)
+                await fs.unlink(uploadedFile.path);
             return res.status(500).json({ message: "About section is not created yet"})
+        }
 
         if((intro == prevAbout.intro || !intro) && (description == prevAbout.description || !description) && (!uploadedFile))
             return res.json({message: "Nothing to update!"});
@@ -67,16 +71,18 @@ export const updateAbout = async(req, res)=>{
         if(description != prevAbout.description && description) prevAbout.description = description;
         if( uploadedFile ){
             //delete previous image from cloudinary
-            await imageDelete(prevAbout.avatar_id);
             const avatar = await imageUpload(uploadedFile.path);
+            await imageDelete(prevAbout.avatar_id);
             prevAbout.avatar = avatar.secure_url;
             prevAbout.avatar_id = avatar.public_id;
-            await fs.unlink(uploadedFile.path);
         }
         await prevAbout.save();
+        await fs.unlink(uploadedFile.path);
         return res.status(200).send("About updated successfully")
     }
     catch(err){
+        if(req.file)
+            await fs.unlink(req.file.path);
         res.status(500).json({ 
             message: "An error occurred while updating the about.",
             error: err.message 

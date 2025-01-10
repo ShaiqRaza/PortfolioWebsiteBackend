@@ -1,5 +1,4 @@
 import cloudinary from "../config/cloudinaryConfig.js";
-import fs from "fs/promises";
 
 export async function imageUpload(filePath) {
     try{
@@ -7,12 +6,9 @@ export async function imageUpload(filePath) {
           resource_type: "image",
         });
 
-        await fs.unlink(filePath);
-
         return res;
     }
     catch(err){
-      await fs.unlink(filePath);
       throw new Error(`Image upload failed: ${err.message}`);
     }
 }
