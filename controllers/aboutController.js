@@ -12,19 +12,19 @@ export const createAbout = async(req, res) => {
 
         if (!(intro && description && uploadedFile)){
             if(uploadedFile)
-                await fs.unlinkSync(uploadedFile.path);
+                await fs.unlink(uploadedFile.path);
             return res.status(400).json({ message: "All fields are required." });
         }
 
         if (process.env.NODE_ENV == 'production'){
-            await fs.unlinkSync(uploadedFile.path);
+            await fs.unlink(uploadedFile.path);
             return res.status(400).json({ message: "You are not allowed to create about." });
         }
 
         const existingAbout = await aboutModel.find();
 
         if (existingAbout.length > 0){
-            await fs.unlinkSync(uploadedFile.path);
+            await fs.unlink(uploadedFile.path);
             return res.status(400).json({ message: "About already exists" });
         }
 
@@ -38,12 +38,12 @@ export const createAbout = async(req, res) => {
             avatar_id: avatar.public_id
         });
 
-        await fs.unlinkSync(uploadedFile.path);
+        await fs.unlink(uploadedFile.path);
         res.status(201).json(newAbout);       
 
     } catch (err) {
         if(uploadedFile)
-            await fs.unlinkSync(uploadedFile.path);
+            await fs.unlink(uploadedFile.path);
         res.status(500).json({ 
             message: "An error occurred while creating the about.",
             error: err.message 
@@ -73,14 +73,14 @@ export const updateAbout = async(req, res)=>{
             const avatar = await imageUpload(uploadedFile);
             prevAbout.avatar = avatar.secure_url;
             prevAbout.avatar_id = avatar.public_id;
-            fs.unlinkSync(uploadedFile.path);
+            await fs.unlink(uploadedFile.path);
         }
         await prevAbout.save();
         return res.status(200).send("About updated successfully")
     }
     catch(err){
         if(uploadedFile)
-            fs.unlinkSync(uploadedFile.path);
+            await fs.unlink(uploadedFile.path);
         res.status(500).json({ 
             message: "An error occurred while updating the about.",
             error: err.message 
