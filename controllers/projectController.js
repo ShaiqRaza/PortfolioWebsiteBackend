@@ -249,7 +249,8 @@ export const deleteImage = async(req, res)=>{
             await imageDelete(public_id);
         }
         catch(err){
-            existingProject.images = reducedImagesArray;        
+            existingProject.images = reducedImagesArray;      
+            //if error doesn't occur in above save then here also, will not  
             await existingProject.save();
             return res.status(500).json({            
                 message:"Something error happened! Can't delete image",
@@ -306,6 +307,52 @@ export const addVideo = async (req, res)=>{
         await fs.unlink(req.file.path);            
         return res.status(500).json({
             message:"Something error happened! Can't add video",
+            error: err.message
+        });
+    }
+}
+
+export const deleteVideo = async(req, res)=>{
+    try{
+        const id = req.params.id;
+        if(!id || !mongoose.Types.ObjectId.isValid(id))
+            return res.status(400).json({ message: "Project ID is required." });
+
+        const {public_id} = req.body;
+        if(!public_id)
+            return res.status(400).json({ message: "All fields are required." });
+
+        const existingProject = await projectModel.findById(id);
+        if(!existingProject)
+            return res.status(400).json({ message: "ID is incorrect." });
+
+        //for backup
+        const original_video = existingProject.video;
+        const original_video_id = existingProject.video_id;
+
+        existingProject.video = null;
+        existingProject.video_id = null;
+        await existingProject.save();
+
+        try{
+            await videoDelete(public_id);
+        }
+        catch(err){
+            existingProject.video = original_video;
+            existingProject.video_id = original_video_id;
+            //if error doesn't occur in above save then here also will not
+            await existingProject.save();
+            return res.status(500).json({
+                message:"Something error happened! Can't delete video",
+                error: err.message
+            });
+        }
+
+        return res.send(existingProject);
+    }
+    catch(err){
+        return res.status(500).json({
+            message:"Something error happened! Can't delete video",
             error: err.message
         });
     }
