@@ -267,6 +267,50 @@ export const deleteImage = async(req, res)=>{
     }
 }
 
+export const addVideo = async (req, res)=>{
+    try{
+        const video = req.file;
+        if(!video)
+            return res.send(400).json({message:"video is not given to add."})
+        
+        const id = req.params.id;
+        if(!id || !mongoose.Types.ObjectId.isValid(id)){
+            await fs.unlink(video.path);
+            return res.status(400).json({ message: "Project ID is required." });
+        }
+
+        const existingProject = await projectModel.findById(id);
+        if(!existingProject){
+            await fs.unlink(video.path);
+            return res.status(400).json({message: "Project ID is incorrect."})
+        }
+
+        const uploadedVideo = await videoUpload(video.path);
+
+        existingProject.video = uploadedVideo.secure_url;
+        existingProject.video_id = uploadedVideo.public_id;
+
+        await existingProject.save();
+        try{
+            await fs.unlink(video.path);
+        }
+        catch(err){
+            return res.status(500).json({
+                message:"Something error happened! Can't add video",
+                error: err.message
+            });
+        }
+        return res.send(existingProject);
+    }
+    catch(err){
+        await fs.unlink(req.file.path);            
+        return res.status(500).json({
+            message:"Something error happened! Can't add video",
+            error: err.message
+        });
+    }
+}
+
 export const deleteProject = async (req, res)=>{
     
 }
