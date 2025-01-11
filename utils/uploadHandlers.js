@@ -47,7 +47,7 @@ export async function videoDelete(public_id) {
   try{
     if(!public_id)
       throw new Error("no video id provided to delete");
-    const res = await cloudinary.uploader.destroy(public_id);
+    const res = await cloudinary.uploader.destroy(public_id, { resource_type: "video" });
 
     if (res.result === 'ok')
       return res.result;
