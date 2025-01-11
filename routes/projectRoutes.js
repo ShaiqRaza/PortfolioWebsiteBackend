@@ -10,5 +10,6 @@ const uploadFields = upload.fields([
 
 router.get('/get-all', getAllProjects);
 router.post('/create',uploadFields, createProject);
+router.post('/update/:id',uploadFields, updateProject);
 
 export default router;
