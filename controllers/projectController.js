@@ -285,6 +285,11 @@ export const addVideo = async (req, res)=>{
             await fs.unlink(video.path);
             return res.status(400).json({message: "Project ID is incorrect."})
         }
+
+        if(existingProject.video){
+            await fs.unlink(video.path);
+            return res.status(400).json({message: "Can't add another video"})
+        }
         
         const uploadedVideo = await videoUpload(video.path);
 
