@@ -1,7 +1,7 @@
 import projectModel from '../models/projectModel.js'
 import { imageUpload, imageDelete, videoUpload, videoDelete } from '../utils/uploadHandlers.js';
 import fs from "fs/promises";
-import mongoose, { Mongoose } from 'mongoose';
+import mongoose from 'mongoose';
 
 export const getAllProjects = async(req, res) =>{
     try{
@@ -218,6 +218,50 @@ export const addImage = async(req, res)=>{
         }
         return res.status(500).json({            
             message:"Something error happened! Can't add image",
+            error: err.message
+        });
+    }
+}
+
+export const deleteImage = async(req, res)=>{
+    try{
+        const {public_id} = req.body;
+        const id = req.params.id;
+        if(!id || !mongoose.Types.ObjectId.isValid(id))
+            return res.status(400).json({ message: "Project ID is required for updating." });
+        if(!public_id)
+            return res.status(400).json({ message: "All fields are required." });
+        const existingProject = await projectModel.findById(id);
+
+        // stored the original array of images for backup
+        const originalImageArray = existingProject.images;
+       
+        //Remove image objects in an images array of project schema
+        const reducedImagesArray = existingProject.images.filter((image)=>{
+            return image.image_id != public_id;
+        })
+        
+        existingProject.images = reducedImagesArray;
+        
+        await existingProject.save();
+        
+        try{
+            await imageDelete(public_id);
+        }
+        catch(err){
+            existingProject.images = reducedImagesArray;        
+            await existingProject.save();
+            return res.status(500).json({            
+                message:"Something error happened! Can't delete image",
+                error: err.message
+            });
+        }
+
+        return res.send(existingProject);
+    }
+    catch(err){
+        return res.status(500).json({            
+            message:"Something error happened! Can't delete image",
             error: err.message
         });
     }
