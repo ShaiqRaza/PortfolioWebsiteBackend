@@ -169,12 +169,12 @@ export const updateProject = async(req, res) =>{
 }
 
 export const addImage = async(req, res)=>{
-    const {image} = req.file;
+    const image = req.file;
     try{
         if(!image)
             return res.json({message: "Image is not given to add."})
 
-        const {id} = req.params.id;
+        const id = req.params.id;
         if(!id || !mongoose.Types.ObjectId.isValid(id)){
             await fs.unlink(image.path);
             return res.status(500).json({message: "Id is not correct in url."});
@@ -186,7 +186,7 @@ export const addImage = async(req, res)=>{
             image_id: uploadedImage.public_id
         }
 
-        const existingProject = await findById(id);
+        const existingProject = await projectModel.findById(id);
         existingProject.images.push(uploadedImageObject)
         await existingProject.save();
         await fs.unlink(image.path)
