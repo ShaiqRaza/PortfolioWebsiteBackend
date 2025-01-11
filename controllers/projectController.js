@@ -1,6 +1,6 @@
-import mongoose from 'mongoose';
 import projectModel from '../models/projectModel.js'
 import { imageUpload, imageDelete, videoUpload, videoDelete } from '../utils/uploadHandlers.js';
+import fs from "fs/promises";
 
 export const getAllProjects = async(req, res) =>{
     try{
@@ -16,14 +16,22 @@ export const getAllProjects = async(req, res) =>{
 }
 
 export const createProject = async(req, res) =>{
+    const {images} = req.files;
+    const {videos} = req.files;
     try{
         const {title, description} = req.body;
-        if(!(title && description))
+
+        if(!(title && description)){
+            if (images) {
+                await Promise.all(images.map(async (image) => {
+                    await fs.unlink(image.path);  // Asynchronous operation
+                }));                
+            }
+            if (videos && videos.length > 0) {
+                await fs.unlink(videos[0].path);
+            }
             return res.status(400).json({ message: "Required fields are not given." });
-
-
-        const {images} = req.files;
-        const {videos} = req.files;
+        }
 
         let uploadedImages = [];
         let uploadedVideo = null;  
@@ -48,9 +56,33 @@ export const createProject = async(req, res) =>{
             video_id: uploadedVideo?.public_id || null
         });
 
+        if (images) {
+            await Promise.all(images.map(async (image) => {
+                await fs.unlink(image.path);  // Asynchronous operation
+            }));            
+        }
+        if (videos && videos.length > 0) {
+            await fs.unlink(videos[0].path);
+        }
         res.status(201).json(newProject);
     }
     catch(err){
+        try{
+            if (images) {
+                await Promise.all(images.map(async (image) => {
+                    await fs.unlink(image.path);  // Asynchronous operation
+                }));                
+            }
+            if (videos && videos.length > 0) {
+                await fs.unlink(videos[0].path);
+            }
+        }
+        catch(err){
+            return res.status(500).json({            
+                message:"Something error happened! Can't create new project",
+                error: err.message
+            });
+        }
         res.status(500).json({            
             message:"Something error happened! Can't create new project",
             error: err.message
