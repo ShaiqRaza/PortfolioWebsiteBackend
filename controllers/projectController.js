@@ -1,7 +1,7 @@
 import projectModel from '../models/projectModel.js'
 import { imageUpload, imageDelete, videoUpload, videoDelete } from '../utils/uploadHandlers.js';
 import fs from "fs/promises";
-import mongoose from 'mongoose';
+import mongoose, { Mongoose } from 'mongoose';
 
 export const getAllProjects = async(req, res) =>{
     try{
@@ -163,6 +163,40 @@ export const updateProject = async(req, res) =>{
         }
         res.status(500).json({            
             message:"Something error happened! Can't update project",
+            error: err.message
+        });
+    }
+}
+
+export const addImage = async(req, res)=>{
+    const {image} = req.file;
+    try{
+        if(!image)
+            return res.json({message: "Image is not given to add."})
+
+        const {id} = req.params.id;
+        if(!id || !mongoose.Types.ObjectId.isValid(id)){
+            await fs.unlink(image.path);
+            return res.status(500).json({message: "Id is not correct in url."});
+        }
+
+        const uploadedImage = await imageUpload(image.path);
+        const uploadedImageObject = {
+            image: uploadedImage.secure_url,
+            image_id: uploadedImage.public_id
+        }
+
+        const existingProject = await findById(id);
+        existingProject.images.push(uploadedImageObject)
+        await existingProject.save();
+        await fs.unlink(image.path)
+        return res.send(existingProject)
+    }
+    catch(err){
+        if(image)
+            await fs.unlink(image.path) 
+        res.status(500).json({            
+            message:"Something error happened! Can't add image",
             error: err.message
         });
     }
