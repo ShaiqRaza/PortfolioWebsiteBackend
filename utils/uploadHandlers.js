@@ -17,8 +17,6 @@ export async function imageDelete(public_id) {
     try{
       const res = await cloudinary.uploader.destroy(public_id);
 
-      console.log(res)
-
       if (res.result == 'ok')
         return res.result;
       else
