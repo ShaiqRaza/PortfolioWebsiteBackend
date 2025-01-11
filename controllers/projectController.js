@@ -169,33 +169,54 @@ export const updateProject = async(req, res) =>{
 }
 
 export const addImage = async(req, res)=>{
-    const image = req.file;
-    try{
-        if(!image)
-            return res.json({message: "Image is not given to add."})
 
+    //if req.file is not given, then using multer image is not uploaded, so no need to unlink file if returning before saving doc
+    const image = req.file;
+    if(!image)
+        return res.json({message: "Image is not given to add."})
+    
+    try{
         const id = req.params.id;
         if(!id || !mongoose.Types.ObjectId.isValid(id)){
             await fs.unlink(image.path);
             return res.status(500).json({message: "Id is not correct in url."});
         }
 
+        const existingProject = await projectModel.findById(id);
+
+        //if error occurs here, then no need to delete image from cloudinary, as that will not be uploaded yet
         const uploadedImage = await imageUpload(image.path);
         const uploadedImageObject = {
             image: uploadedImage.secure_url,
             image_id: uploadedImage.public_id
         }
 
-        const existingProject = await projectModel.findById(id);
         existingProject.images.push(uploadedImageObject)
-        await existingProject.save();
-        await fs.unlink(image.path)
+        try{
+            await fs.unlink(image.path);
+            await existingProject.save();
+        }
+        catch(err){
+            await imageDelete(uploadedImageObject.image_id)
+            return res.status(500).json({            
+                message:"Something error happened! Can't add image",
+                error: err.message
+            });
+        }
         return res.send(existingProject)
     }
     catch(err){
-        if(image)
-            await fs.unlink(image.path) 
-        res.status(500).json({            
+        try{
+            if(image)
+                await fs.unlink(image.path);
+        }
+        catch(cleanUpErr){
+            return res.status(500).json({            
+                message:"Something error happened! Can't add image",
+                error: cleanUpErr.message
+            });
+        }
+        return res.status(500).json({            
             message:"Something error happened! Can't add image",
             error: err.message
         });
