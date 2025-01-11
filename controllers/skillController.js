@@ -30,7 +30,7 @@ export const createSkill = async(req, res) =>{
             title,
             description
         });
-        res.status(201).json(newSkill);
+        res.status(201).send(newSkill);
     }
     catch(err){
         res.status(500).json({ 
@@ -66,7 +66,7 @@ export const updateSkill = async(req, res) =>{
         if (description) existingSkill.description = description;
 
         await existingSkill.save();
-        return res.status(200).json(existingSkill);
+        return res.status(200).send(existingSkill);
     }
     catch(err){
         return res.status(500).json({ 
