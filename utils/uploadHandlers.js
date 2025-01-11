@@ -37,13 +37,8 @@ export async function videoUpload(filePath) {
       resource_type: "video",
     });
 
-    // Remove the file from the local storage after upload
-    fs.unlinkSync(filePath);
-
     return result;
   } catch (err) {
-    // Remove the file if there's an error
-    fs.unlinkSync(filePath);
     throw new Error(`Video upload failed: ${JSON.stringify(err)}`);
   }
 }

@@ -272,7 +272,7 @@ export const addVideo = async (req, res)=>{
     try{
         const video = req.file;
         if(!video)
-            return res.send(400).json({message:"video is not given to add."})
+            return res.status(400).json({message:"video is not given to add."})
         
         const id = req.params.id;
         if(!id || !mongoose.Types.ObjectId.isValid(id)){
@@ -285,7 +285,7 @@ export const addVideo = async (req, res)=>{
             await fs.unlink(video.path);
             return res.status(400).json({message: "Project ID is incorrect."})
         }
-
+        
         const uploadedVideo = await videoUpload(video.path);
 
         existingProject.video = uploadedVideo.secure_url;
@@ -304,7 +304,8 @@ export const addVideo = async (req, res)=>{
         return res.send(existingProject);
     }
     catch(err){
-        await fs.unlink(req.file.path);            
+        if(req.file)
+            await fs.unlink(req.file.path);            
         return res.status(500).json({
             message:"Something error happened! Can't add video",
             error: err.message
