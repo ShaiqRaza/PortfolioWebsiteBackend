@@ -385,7 +385,7 @@ export const deleteProject = async (req, res)=>{
                 //if error occurs then just continue
             }
 
-        await existingProject.remove();
+        await existingProject.deleteOne();
         res.status(200).json({ message: "Project deleted successfully." });
     }
     catch(err){
