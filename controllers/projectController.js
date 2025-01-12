@@ -365,5 +365,33 @@ export const deleteVideo = async(req, res)=>{
 }
 
 export const deleteProject = async (req, res)=>{
-    
+    try{
+        const id = req.params.id;
+        if(!id || !mongoose.Types.ObjectId.isValid(id))
+            return res.status(400).json({ message: "Project ID is required." });
+
+        const existingProject = await projectModel.findById(id);
+        if(!existingProject)
+            return res.status(400).json({ message: "ID is incorrect." });
+
+        if(existingProject.video)
+            await videoDelete(existingProject.video_id);
+
+        if(existingProject.images.length>0)
+            try{
+                await Promise.all(existingProject.images.map(async(image)=>await imageDelete(image.image_id)));
+            }
+            catch(err){
+                //if error occurs then just continue
+            }
+
+        await existingProject.remove();
+        res.status(200).json({ message: "Project deleted successfully." });
+    }
+    catch(err){
+        res.status(500).json({            
+            message:"Something error happened! Can't delete project",
+            error: err.message
+        });
+    }
 }
