@@ -330,30 +330,13 @@ export const deleteVideo = async(req, res)=>{
 
         const existingProject = await projectModel.findById(id);
         if(!existingProject)
-            return res.status(400).json({ message: "ID is incorrect." });
+            return res.status(400).json({ message: "Project is not found." });
 
-        //for backup
-        const original_video = existingProject.video;
-        const original_video_id = existingProject.video_id;
-
+        await videoDelete(public_id);
         existingProject.video = null;
         existingProject.video_id = null;
+
         await existingProject.save();
-
-        try{
-            await videoDelete(public_id);
-        }
-        catch(err){
-            existingProject.video = original_video;
-            existingProject.video_id = original_video_id;
-            //if error doesn't occur in above save then here also will not
-            await existingProject.save();
-            return res.status(500).json({
-                message:"Something error happened! Can't delete video",
-                error: err.message
-            });
-        }
-
         return res.send(existingProject);
     }
     catch(err){
@@ -372,19 +355,14 @@ export const deleteProject = async (req, res)=>{
 
         const existingProject = await projectModel.findById(id);
         if(!existingProject)
-            return res.status(400).json({ message: "ID is incorrect." });
-
+            return res.status(400).json({ message: "Project is not found." });
+       
         if(existingProject.video)
             await videoDelete(existingProject.video_id);
-
+        
         if(existingProject.images.length>0)
-            try{
-                await Promise.all(existingProject.images.map(async(image)=>await imageDelete(image.image_id)));
-            }
-            catch(err){
-                //if error occurs then just continue
-            }
-
+            await Promise.all(existingProject.images.map(async(image)=>await imageDelete(image.image_id)));
+        
         await existingProject.deleteOne();
         res.status(200).json({ message: "Project deleted successfully." });
     }
