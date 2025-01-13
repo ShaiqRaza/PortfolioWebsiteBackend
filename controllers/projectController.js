@@ -283,12 +283,12 @@ export const addVideo = async (req, res)=>{
         const existingProject = await projectModel.findById(id);
         if(!existingProject){
             await fs.unlink(video.path);
-            return res.status(400).json({message: "Project ID is incorrect."})
+            return res.status(400).json({message: "Project is not found."})
         }
 
         if(existingProject.video){
             await fs.unlink(video.path);
-            return res.status(400).json({message: "Can't add another video"})
+            return res.status(400).json({message: "Cannot add more than one video."})
         }
         
         const uploadedVideo = await videoUpload(video.path);
