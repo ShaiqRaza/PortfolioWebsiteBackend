@@ -225,38 +225,27 @@ export const addImage = async(req, res)=>{
 
 export const deleteImage = async(req, res)=>{
     try{
-        const {public_id} = req.body;
         const id = req.params.id;
         if(!id || !mongoose.Types.ObjectId.isValid(id))
             return res.status(400).json({ message: "Project ID is required for updating." });
+        
+        const {public_id} = req.body;//getting public_id of particular image to delete
         if(!public_id)
             return res.status(400).json({ message: "All fields are required." });
-        const existingProject = await projectModel.findById(id);
 
-        // stored the original array of images for backup
-        const originalImageArray = existingProject.images;
-       
+        const existingProject = await projectModel.findById(id);
+        if(!existingProject)
+            return res.status(400).json({message: "Project is not found."})
+
+        await imageDelete(public_id);
+
         //Remove image objects in an images array of project schema
         const reducedImagesArray = existingProject.images.filter((image)=>{
             return image.image_id != public_id;
         })
         
-        existingProject.images = reducedImagesArray;
-        
+        existingProject.images = reducedImagesArray;       
         await existingProject.save();
-        
-        try{
-            await imageDelete(public_id);
-        }
-        catch(err){
-            existingProject.images = reducedImagesArray;      
-            //if error doesn't occur in above save then here also, will not  
-            await existingProject.save();
-            return res.status(500).json({            
-                message:"Something error happened! Can't delete image",
-                error: err.message
-            });
-        }
 
         return res.send(existingProject);
     }
