@@ -306,11 +306,28 @@ export const deleteVideo = async(req, res)=>{
         if(!existingProject)
             return res.status(400).json({ message: "Project is not found." });
 
-        await videoDelete(public_id);
-        existingProject.video = null;
-        existingProject.video_id = null;
+        //for backup
+        let originalVideo = existingProject.video;
+        let originalVideo_id = existingProject.video_id;
 
+        existingProject.video = null;
+        existingProject.video_id = null;       
         await existingProject.save();
+
+        try{
+            await videoDelete(public_id);
+        }
+        catch(err){
+            existingProject.video = originalVideo;
+            existingProject.video_id = originalVideo_id;       
+            await existingProject.save();
+
+            return res.status(500).json({
+                message:"Something error happened! Can't delete video",
+                error: err.message
+            });
+        }
+
         return res.send(existingProject);
     }
     catch(err){
