@@ -364,7 +364,16 @@ export const deleteProject = async (req, res)=>{
             await videoDelete(existingProject.video_id);
         
         if(existingProject.images.length>0)
-            await Promise.all(existingProject.images.map(async(image)=>await imageDelete(image.image_id)));
+            try{
+                await Promise.all(existingProject.images.map(async(image)=>await imageDelete(image.image_id)));
+            }
+            catch(err){
+                await existingProject.deleteOne();
+                res.status(500).json({            
+                    message:"Project deleted but images can't delete from server",
+                    error: err.message
+                });
+            }
         
         await existingProject.deleteOne();
         res.status(200).json({ message: "Project deleted successfully." });
