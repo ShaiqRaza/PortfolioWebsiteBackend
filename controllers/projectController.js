@@ -241,6 +241,7 @@ export const deleteImage = async(req, res)=>{
 }
 
 export const addVideo = async (req, res)=>{
+    let uploadedVideo = null;
     try{
         const video = req.file;
         if(!video)
@@ -263,29 +264,30 @@ export const addVideo = async (req, res)=>{
             return res.status(400).json({message: "Cannot add more than one video."})
         }
         
-        const uploadedVideo = await videoUpload(video.path);
+        uploadedVideo = await videoUpload(video.path);
 
         existingProject.video = uploadedVideo.secure_url;
         existingProject.video_id = uploadedVideo.public_id;
 
         await existingProject.save();
-        try{
-            await fs.unlink(video.path);
-        }
-        catch(err){
-            return res.status(500).json({
-                message:"Something error happened! Can't add video",
-                error: err.message
-            });
-        }
+        await fs.unlink(video.path);
+
         return res.send(existingProject);
     }
     catch(err){
-        if(req.file)
-            await fs.unlink(req.file.path);            
+        let errorMessage = err.message;
+        try{
+            if(req.file)
+                await fs.unlink(req.file.path);
+            if(uploadedVideo)
+                await videoDelete(uploadedVideo.public_id);
+        }
+        catch(err){
+            errorMessage = `${errorMessage} -  CleanUpError: ${err.message}`
+        }
         return res.status(500).json({
             message:"Something error happened! Can't add video",
-            error: err.message
+            error: errorMessage
         });
     }
 }
