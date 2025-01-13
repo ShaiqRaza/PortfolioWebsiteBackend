@@ -1,7 +1,7 @@
 import express from 'express'
 const router = express.Router();
 
-import {getAllProjects, createProject, deleteProject, addImage, deleteImage, addVideo, deleteVideo} from '../controllers/projectController.js'
+import {getAllProjects, createProject, deleteProject, addImage, deleteImage, addVideo, deleteVideo, updateTitle, updateDescription} from '../controllers/projectController.js'
 import upload from '../config/multerConfig.js'
 const uploadFields = upload.fields([
     { name: 'videos', maxCount: 1 },
@@ -15,5 +15,7 @@ router.post('/delete-image/:id', deleteImage);
 router.post('/add-video/:id', upload.single('video'), addVideo);
 router.post('/delete-video/:id', deleteVideo);
 router.post('/delete/:id', deleteProject);
+router.post('/update-title/:id', updateTitle);
+router.post('/update-description/:id', updateDescription);
 
 export default router;
