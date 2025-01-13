@@ -169,7 +169,6 @@ export const updateProject = async(req, res) =>{
 }
 
 export const addImage = async(req, res)=>{
-
     //if req.file is not given, then using multer image is not uploaded, so no need to unlink file if returning before saving doc
     const image = req.file;
     if(!image)
@@ -183,6 +182,8 @@ export const addImage = async(req, res)=>{
         }
 
         const existingProject = await projectModel.findById(id);
+        if(!existingProject)
+            return res.status(400).json({message: "Project is not found."})
 
         //if error occurs here, then no need to delete image from cloudinary, as that will not be uploaded yet
         const uploadedImage = await imageUpload(image.path);
