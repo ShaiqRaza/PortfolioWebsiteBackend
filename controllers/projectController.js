@@ -91,7 +91,7 @@ export const updateTitle = async(req, res)=>{
 
         const id = req.params.id;
         if(!id || !mongoose.Types.ObjectId.isValid(id))
-            return res.status(400).json({ message: "Project ID is required." });
+            return res.status(400).json({ message: "Project ID is not correct." });
 
         const existingProject = await projectModel.findById(id);
         if(!existingProject)
@@ -102,6 +102,7 @@ export const updateTitle = async(req, res)=>{
 
         existingProject.title = title;
         await existingProject.save();
+        return res.send(existingProject);
     }
     catch(err){
         res.status(500).json({            
@@ -119,7 +120,7 @@ export const updateDescription = async(req, res)=>{
 
         const id = req.params.id;
         if(!id || !mongoose.Types.ObjectId.isValid(id))
-            return res.status(400).json({ message: "Project ID is required." });
+            return res.status(400).json({ message: "Project ID is not correct." });
 
         const existingProject = await projectModel.findById(id);
         if(!existingProject)
@@ -130,6 +131,7 @@ export const updateDescription = async(req, res)=>{
 
         existingProject.description = description;
         await existingProject.save();
+        return res.send(existingProject);
     }
     catch(err){
         res.status(500).json({            
@@ -149,7 +151,7 @@ export const addImage = async(req, res)=>{
         const id = req.params.id;
         if(!id || !mongoose.Types.ObjectId.isValid(id)){
             await fs.unlink(image.path);
-            return res.status(500).json({message: "Id is not correct in url."});
+            return res.status(500).json({message: "Project ID is not correct."});
         }
 
         const existingProject = await projectModel.findById(id);
@@ -199,7 +201,7 @@ export const deleteImage = async(req, res)=>{
     try{
         const id = req.params.id;
         if(!id || !mongoose.Types.ObjectId.isValid(id))
-            return res.status(400).json({ message: "Project ID is required for updating." });
+            return res.status(400).json({ message: "Project ID is not correct." });
         
         const {public_id} = req.body;//getting public_id of particular image to delete
         if(!public_id)
@@ -252,7 +254,7 @@ export const addVideo = async (req, res)=>{
         const id = req.params.id;
         if(!id || !mongoose.Types.ObjectId.isValid(id)){
             await fs.unlink(video.path);
-            return res.status(400).json({ message: "Project ID is required." });
+            return res.status(400).json({ message: "Project ID is not correct." });
         }
 
         const existingProject = await projectModel.findById(id);
@@ -297,7 +299,7 @@ export const deleteVideo = async(req, res)=>{
     try{
         const id = req.params.id;
         if(!id || !mongoose.Types.ObjectId.isValid(id))
-            return res.status(400).json({ message: "Project ID is required." });
+            return res.status(400).json({ message: "Project ID is not correct." });
 
         const {public_id} = req.body;
         if(!public_id)
@@ -326,7 +328,7 @@ export const deleteProject = async (req, res)=>{
     try{
         const id = req.params.id;
         if(!id || !mongoose.Types.ObjectId.isValid(id))
-            return res.status(400).json({ message: "Project ID is required." });
+            return res.status(400).json({ message: "Project ID is not correct." });
 
         const existingProject = await projectModel.findById(id);
         if(!existingProject)
