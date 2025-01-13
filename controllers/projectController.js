@@ -160,6 +160,34 @@ export const updateProject = async(req, res) =>{
     }
 }
 
+export const updateTitle = async(req, res)=>{
+    try{
+        const {title} = req.body;
+        if(!title)
+            return res.status(400).json({message: "Nothing to update!"});
+
+        const id = req.params.id;
+        if(!id || !mongoose.Types.ObjectId.isValid(id))
+            return res.status(400).json({ message: "Project ID is required." });
+
+        const existingProject = await projectModel.findById(id);
+        if(!existingProject)
+            return res.status(400).json({message: "Project is not found."})
+
+        if(title == existingProject.title)
+            return res.status(400).json({message: "Nothing to update!"});
+
+        existingProject.title = title;
+        await existingProject.save();
+    }
+    catch(err){
+        res.status(500).json({            
+            message:"Something error happened! Can't update title.",
+            error: err.message
+        });
+    }
+}
+
 export const addImage = async(req, res)=>{
     //if req.file is not given, then using multer image is not uploaded, so no need to unlink file if returning before saving doc
     const image = req.file;
