@@ -3,6 +3,18 @@ import { imageUpload, imageDelete, videoUpload, videoDelete } from '../utils/upl
 import fs from "fs/promises";
 import mongoose from 'mongoose';
 
+//utlis for project controller only
+const cleanUpFromDisk = async (images, videos)=>{
+    if (images) {
+        await Promise.all(images.map(async (image) => {
+            await fs.unlink(image.path);  // Asynchronous operation
+        }));                
+    }
+    if (videos && videos.length > 0) {
+        await fs.unlink(videos[0].path);
+    }
+}
+
 export const getAllProjects = async(req, res) =>{
     try{
         const projects = await projectModel.find();
@@ -17,25 +29,17 @@ export const getAllProjects = async(req, res) =>{
 }
 
 export const createProject = async(req, res) =>{
-    const {images} = req.files;
-    const {videos} = req.files;
+    const {images, videos} = req.files;
+    let uploadedImages = [];
+    let uploadedVideo = null;  
+
     try{
         const {title, description} = req.body;
 
         if(!(title && description)){
-            if (images) {
-                await Promise.all(images.map(async (image) => {
-                    await fs.unlink(image.path);  // Asynchronous operation
-                }));                
-            }
-            if (videos && videos.length > 0) {
-                await fs.unlink(videos[0].path);
-            }
+            await cleanUpFromDisk(images, videos);
             return res.status(400).json({ message: "Required fields are not given." });
         }
-
-        let uploadedImages = [];
-        let uploadedVideo = null;  
 
         if(images)
             uploadedImages = await Promise.all(images.map(async (image) => {
@@ -57,36 +61,24 @@ export const createProject = async(req, res) =>{
             video_id: uploadedVideo?.public_id || null
         });
 
-        if (images) {
-            await Promise.all(images.map(async (image) => {
-                await fs.unlink(image.path);  // Asynchronous operation
-            }));            
-        }
-        if (videos && videos.length > 0) {
-            await fs.unlink(videos[0].path);
-        }
+        await cleanUpFromDisk(images, videos);
         res.status(201).json(newProject);
     }
     catch(err){
+        let errorMessage = err.message;
         try{
-            if (images) {
-                await Promise.all(images.map(async (image) => {
-                    await fs.unlink(image.path);  // Asynchronous operation
-                }));                
-            }
-            if (videos && videos.length > 0) {
-                await fs.unlink(videos[0].path);
-            }
+            await cleanUpFromDisk(images, videos);
+            if(uploadedImages.length>0)
+                await Promise.all(images.map(async (image) => await imageDelete(image.image_id)));
+            if(uploadedVideo)
+                await videoDelete(uploadedVideo.public_id);
         }
         catch(err){
-            return res.status(500).json({            
-                message:"Something error happened! Can't create new project",
-                error: err.message
-            });
+            errorMessage = `${errorMessage} - ClenaUpError: ${err.message}`;
         }
         res.status(500).json({            
             message:"Something error happened! Can't create new project",
-            error: err.message
+            error: errorMessage
         });
     }
 }
