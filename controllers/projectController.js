@@ -145,7 +145,8 @@ export const addImage = async(req, res)=>{
     //if req.file is not given, then using multer image is not uploaded, so no need to unlink file if returning before saving doc
     const image = req.file;
     if(!image)
-        return res.json({message: "Image is not given to add."})
+        return res.json({message: "Image is not given to add."});
+    let uploadedImage = null;
     
     try{
         const id = req.params.id;
@@ -155,44 +156,38 @@ export const addImage = async(req, res)=>{
         }
 
         const existingProject = await projectModel.findById(id);
-        if(!existingProject)
+        if(!existingProject){
+            await fs.unlink(image.path);
             return res.status(400).json({message: "Project is not found."})
+        }
 
         //if error occurs here, then no need to delete image from cloudinary, as that will not be uploaded yet
-        const uploadedImage = await imageUpload(image.path);
+        uploadedImage = await imageUpload(image.path);
         const uploadedImageObject = {
             image: uploadedImage.secure_url,
             image_id: uploadedImage.public_id
         }
+        existingProject.images.push(uploadedImageObject);
 
-        existingProject.images.push(uploadedImageObject)
-        try{
-            await fs.unlink(image.path);
-            await existingProject.save();
-        }
-        catch(err){
-            await imageDelete(uploadedImageObject.image_id)
-            return res.status(500).json({            
-                message:"Something error happened! Can't add image",
-                error: err.message
-            });
-        }
+        await fs.unlink(image.path);
+        await existingProject.save();
+
         return res.send(existingProject)
     }
     catch(err){
+        let errorMessage = err.message;
         try{
             if(image)
                 await fs.unlink(image.path);
+            if(uploadedImage)
+                await imageDelete(uploadedImage.public_id);
         }
-        catch(cleanUpErr){
-            return res.status(500).json({            
-                message:"Something error happened! Can't add image",
-                error: cleanUpErr.message
-            });
+        catch(err){
+            errorMessage = `${errorMessage} -  CleanUpError: ${err.message}`
         }
         return res.status(500).json({            
             message:"Something error happened! Can't add image",
-            error: err.message
+            error: errorMessage
         });
     }
 }
