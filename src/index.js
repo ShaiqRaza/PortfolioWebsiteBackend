@@ -18,12 +18,14 @@ import aboutRoutes from '../routes/aboutRoutes.js';
 import authRoutes from '../routes/authRoutes.js'
 import adminRoutes from '../routes/adminRoutes.js'
 import projectRoutes from '../routes/projectRoutes.js'
+import docRoutes from '../routes/docRoutes.js'
 
 app.use('/skills', skillRoutes);
 app.use('/about', aboutRoutes);
 app.use('/auth', authRoutes);
 app.use('/admin', adminRoutes);
 app.use('/project', projectRoutes);
+app.use('/doc', docRoutes);
 
 app.get('/', (req, res) => {
   res.send("hello");
