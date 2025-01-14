@@ -338,6 +338,8 @@ export const deleteVideo = async(req, res)=>{
     }
 }
 
+//need transaction kind of concept in mongoose to handle all edge case errors
+// so will this update in future
 export const deleteProject = async (req, res)=>{
     try{
         const id = req.params.id;

@@ -5,6 +5,7 @@ import { imageUpload, imageDelete } from '../utils/uploadHandlers.js';
 import fs from "fs/promises";
 
 export const createAbout = async(req, res) => {
+    let avatar = null;
     try {       
         const uploadedFile = req.file ? req.file : null;
         const { intro, description } = req.body;
@@ -28,7 +29,7 @@ export const createAbout = async(req, res) => {
         }
 
         //image upload to cloudinary
-        const avatar = await imageUpload(uploadedFile.path);
+        avatar = await imageUpload(uploadedFile.path);
 
         const newAbout = await aboutModel.create({
             intro,
@@ -41,11 +42,19 @@ export const createAbout = async(req, res) => {
         res.status(201).send(newAbout);       
 
     } catch (err) {
-        if(req.file)
-            await fs.unlink(req.file.path);
+        let errorMessage = err.message;
+        try{
+            if(req.file)
+                await fs.unlink(req.file.path);
+            if(avatar)
+                await imageDelete(avatar.public_id);
+        }
+        catch(err){
+            errorMessage = `${errorMessage} -  CleanUpError: ${err.message}`
+        }
         res.status(500).json({ 
             message: "An error occurred while creating the about.",
-            error: err.message 
+            error: errorMessage 
         });
     }
 }
