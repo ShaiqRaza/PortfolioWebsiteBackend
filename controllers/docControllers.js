@@ -2,6 +2,7 @@ import docModel from "../models/docModel.js";
 import mongoose from "mongoose";
 import { imageDelete, imageUpload } from "../utils/uploadHandlers.js";
 import fs from 'fs/promises'
+import { execSync } from "child_process";
 
 export const createDoc = async(req, res)=>{
     let uploadedImage = null;
@@ -109,5 +110,61 @@ export const updateDescription = async(req, res)=>{
             message:"Something error happened! Can't update description.",
             error: err.message
         });
+    }
+}
+
+export const updateImage = async(req, res)=>{
+    let uploadedImage = null;
+    try{
+        const image = req.file;
+        if(!image)
+            return res.status(500).json({message: "All fields are required."});
+
+        const id = req.params.id;
+        if(!id || !mongoose.Types.ObjectId.isValid(id))
+            return res.status(400).json({ message: "Document ID is not correct." });
+
+        const existingDoc = await docModel.findById(id);
+        if(!existingDoc)
+            return res.status(400).json({message: "Document not found."});
+
+        uploadedImage = await imageUpload(image.path);
+        
+        existingDoc.image = uploadedImage.secure_url;
+        existingDoc.image_id = uploadedImage.public_id;
+
+        await fs.unlink(image.path);
+
+        await existingDoc.save();
+
+        try{
+            await imageDelete(existingDoc.image_id);
+        }
+        catch(err){
+            return res.status(500).json({
+                data: existingDoc,
+                message: "Document created but image couldn't delete from server.",
+            });
+        }
+
+        return res.status(200).json({
+            data: existingDoc,
+            message: "Image updated successfully."
+        });
+    }
+    catch(err){
+        let errorMessage = err.message;
+        try{
+            if(uploadedImage)
+                await imageDelete(uploadedImage.public_id);
+            await fs.unlink(req.file.path);
+        }
+        catch(err){
+            errorMessage = `${errorMessage} - CleanUpError: ${err.message}`
+        }
+        res.status(500).json({
+            message: "Some error occured at image updation.",
+            message: errorMessage
+        })
     }
 }
