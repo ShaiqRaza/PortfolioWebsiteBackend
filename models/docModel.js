@@ -5,6 +5,10 @@ const docSchema = mongoose.Schema({
         type:String,
         required: true
     },
+    image_id:{
+        type:String,
+        required: true
+    },
     title:{
         type:String,
         required: true
