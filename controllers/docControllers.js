@@ -44,3 +44,36 @@ export const createDoc = async(req, res)=>{
         })
     }
 }
+
+export const updateTitle = async(req, res)=>{
+    try{
+        const {title} = req.body;
+        if(!title)
+            return res.status(400).json({message: "Nothing to update!"});
+
+        const id = req.params.id;
+        if(!id || !mongoose.Types.ObjectId.isValid(id))
+            return res.status(400).json({ message: "Document ID is not correct." });
+
+        const existingDoc = await docModel.findById(id);
+        if(!existingDoc)
+            return res.status(400).json({message: "Document, not found."})
+
+        if(title == existingDoc.title)
+            return res.status(400).json({message: "Nothing to update!"});
+
+        existingDoc.title = title;
+        await existingDoc.save();
+        
+        return res.json({
+            data: existingDoc,
+            message: "Title updated successfully."
+        });
+    }
+    catch(err){
+        res.status(500).json({            
+            message:"Something error happened! Can't update title.",
+            error: err.message
+        });
+    }
+}
