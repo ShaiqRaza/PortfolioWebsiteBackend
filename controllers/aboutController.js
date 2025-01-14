@@ -67,7 +67,7 @@ export const updateAbout = async(req, res)=>{
         if(!(intro || description || uploadedFile))
             return res.status(500).json({message: "Nothing to update!"});
         
-        prevAbout = await aboutModel.findOne();
+        const prevAbout = await aboutModel.findOne();
         if(!prevAbout){
             if(uploadedFile)
                 await fs.unlink(uploadedFile.path);
@@ -89,12 +89,12 @@ export const updateAbout = async(req, res)=>{
         
         await prevAbout.save();
 
-        if(prevAbout.avatar_id)
+        if(prevAbout.avatar_id && uploadedFile)
             try{
                 await imageDelete(prevAbout.avatar_id);
             }
             catch(err){
-                res.status(500).json({ 
+                return res.status(500).json({ 
                     data: prevAbout,
                     message: "About updated but previous avatar can't delete from server."
                 });
