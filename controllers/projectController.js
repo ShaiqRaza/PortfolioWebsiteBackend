@@ -29,7 +29,7 @@ export const getAllProjects = async(req, res) =>{
 }
 
 export const createProject = async(req, res) =>{
-    const {images, videos} = req.files;
+    const {images=null, videos=null} = req.files || {};
     let uploadedImages = [];
     let uploadedVideo = null;  
 
@@ -198,8 +198,8 @@ export const deleteImage = async(req, res)=>{
         if(!id || !mongoose.Types.ObjectId.isValid(id))
             return res.status(400).json({ message: "Project ID is not correct." });
         
-        const {public_id} = req.body;//getting public_id of particular image to delete
-        if(!public_id)
+        const {image_id} = req.body;//getting public_id of particular image to delete
+        if(!image_id)
             return res.status(400).json({ message: "All fields are required." });
 
         const existingProject = await projectModel.findById(id);
@@ -211,14 +211,14 @@ export const deleteImage = async(req, res)=>{
        
         //Remove image objects in an images array of project schema
         const reducedImagesArray = existingProject.images.filter((image)=>{
-            return image.image_id != public_id;
+            return image.image_id != image_id;
         })
         
         existingProject.images = reducedImagesArray;        
         await existingProject.save();
         
         try{
-            await imageDelete(public_id);
+            await imageDelete(image_id);
         }
         catch(err){
             existingProject.images = originalImageArray;      
@@ -298,8 +298,8 @@ export const deleteVideo = async(req, res)=>{
         if(!id || !mongoose.Types.ObjectId.isValid(id))
             return res.status(400).json({ message: "Project ID is not correct." });
 
-        const {public_id} = req.body;
-        if(!public_id)
+        const {video_id} = req.body;
+        if(!video_id)
             return res.status(400).json({ message: "All fields are required." });
 
         const existingProject = await projectModel.findById(id);
@@ -315,7 +315,7 @@ export const deleteVideo = async(req, res)=>{
         await existingProject.save();
 
         try{
-            await videoDelete(public_id);
+            await videoDelete(video_id);
         }
         catch(err){
             existingProject.video = originalVideo;
@@ -323,7 +323,7 @@ export const deleteVideo = async(req, res)=>{
             await existingProject.save();
 
             return res.status(500).json({
-                message:"Something error happened! Can't delete video",
+                message:"Something error happened! Can't delete video from server.",
                 error: err.message
             });
         }
@@ -332,7 +332,7 @@ export const deleteVideo = async(req, res)=>{
     }
     catch(err){
         return res.status(500).json({
-            message:"Something error happened! Can't delete video",
+            message:"Something error happened! Can't delete video.",
             error: err.message
         });
     }
