@@ -129,7 +129,35 @@ export const updateAbout = async(req, res)=>{
     }
 }
 
+export const updateIntro = async(req, res)=>{
+    try{
+        const {intro} = req.body;
+        if(!intro)
+            return res.status(400).json({success: false, message: "Nothing to update!"});
+        
+        const about = await findOne();
+        if(!about)
+            return res.status(400).json({success: false, message: "About section is not created yet."});
 
+        if(intro == about.intro)
+            return res.status(400).json({success: false, message: "Nothing to update!"});
+
+        about.intro = intro;
+        await about.save();
+        return res.json({
+            success: true,
+            data: about,
+            message: "Intro updated successfully."
+        });
+    }
+    catch(err){
+        res.status(500).json({
+            success: false,            
+            message:"Something error happened! Can't update intro.",
+            error: err.message
+        });
+    }
+}
 
 export const updateDescription = async(req, res)=>{
     try{
