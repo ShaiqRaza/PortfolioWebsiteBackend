@@ -129,7 +129,7 @@ export const updateIntro = async(req, res)=>{
         if(!intro)
             return res.status(400).json({success: false, message: "Nothing to update!"});
         
-        const about = await findOne();
+        const about = await aboutModel.findOne();
         if(!about)
             return res.status(400).json({success: false, message: "About section is not created yet."});
 
@@ -159,7 +159,7 @@ export const updateDescription = async(req, res)=>{
         if(!description)
             return res.status(400).json({success: false, message: "Nothing to update!"});
         
-        const about = await findOne();
+        const about = await aboutModel.findOne();
         if(!about)
             return res.status(400).json({success: false, message: "About section is not created yet."});
 
