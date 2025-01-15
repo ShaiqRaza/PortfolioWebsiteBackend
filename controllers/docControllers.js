@@ -134,17 +134,19 @@ export const updateImage = async(req, res)=>{
         if(!existingDoc)
             return res.status(400).json({success: false, message: "Document not found."});
 
+        const prevImageId = existingDoc.image_id;
+
         uploadedImage = await imageUpload(image.path);
         
         existingDoc.image = uploadedImage.secure_url;
         existingDoc.image_id = uploadedImage.public_id;
-
-        await fs.unlink(image.path);
-
+        
         await existingDoc.save();
-
+        
+        await fs.unlink(image.path);
+        
         try{
-            await imageDelete(existingDoc.image_id);
+            await imageDelete(prevImageId);
         }
         catch(err){
             return res.status(200).json({
