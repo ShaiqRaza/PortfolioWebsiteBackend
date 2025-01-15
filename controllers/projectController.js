@@ -18,10 +18,15 @@ const cleanUpFromDisk = async (images, videos)=>{
 export const getAllProjects = async(req, res) =>{
     try{
         const projects = await projectModel.find();
-        res.status(200).send(projects);
+        res.status(200).json({
+            success: true,
+            data: projects,
+            message: "All projects loaded successfully"
+        });
     }
     catch(err){
-        res.status(500).json({            
+        res.status(500).json({  
+            success: false,          
             message:"Something error happened! Can't load All projects",
             error: err.message
         });
@@ -38,7 +43,7 @@ export const createProject = async(req, res) =>{
 
         if(!(title && description)){
             await cleanUpFromDisk(images, videos);
-            return res.status(400).json({ message: "Required fields are not given." });
+            return res.status(400).json({success: false, message: "Required fields are not given." });
         }
 
         if(images)
@@ -62,7 +67,11 @@ export const createProject = async(req, res) =>{
         });
 
         await cleanUpFromDisk(images, videos);
-        res.status(201).json(newProject);
+        res.status(200).json({
+            success: true,
+            data: newProject,
+            message: "Project created successfully"
+        });
     }
     catch(err){
         let errorMessage = err.message;
@@ -76,7 +85,8 @@ export const createProject = async(req, res) =>{
         catch(err){
             errorMessage = `${errorMessage} - ClenaUpError: ${err.message}`;
         }
-        res.status(500).json({            
+        res.status(500).json({    
+            success: false,        
             message:"Something error happened! Can't create new project",
             error: errorMessage
         });
@@ -87,25 +97,30 @@ export const updateTitle = async(req, res)=>{
     try{
         const {title} = req.body;
         if(!title)
-            return res.status(400).json({message: "Nothing to update!"});
+            return res.status(400).json({success: false, message: "Nothing to update!"});
 
         const id = req.params.id;
         if(!id || !mongoose.Types.ObjectId.isValid(id))
-            return res.status(400).json({ message: "Project ID is not correct." });
+            return res.status(400).json({success: false, message: "Project ID is not correct." });
 
         const existingProject = await projectModel.findById(id);
         if(!existingProject)
-            return res.status(400).json({message: "Project is not found."})
+            return res.status(400).json({success: false, message: "Project not found."})
 
         if(title == existingProject.title)
-            return res.status(400).json({message: "Nothing to update!"});
+            return res.status(400).json({success: false, message: "Nothing to update!"});
 
         existingProject.title = title;
         await existingProject.save();
-        return res.send(existingProject);
+        return res.status(200).json({
+            success: true,
+            data: existingProject,
+            message: "Title updated successfully"
+        });
     }
     catch(err){
-        res.status(500).json({            
+        res.status(500).json({     
+            success: false,       
             message:"Something error happened! Can't update title.",
             error: err.message
         });
@@ -116,25 +131,30 @@ export const updateDescription = async(req, res)=>{
     try{
         const {description} = req.body;
         if(!description)
-            return res.status(400).json({message: "Nothing to update!"});
+            return res.status(400).json({success: false, message: "Nothing to update!"});
 
         const id = req.params.id;
         if(!id || !mongoose.Types.ObjectId.isValid(id))
-            return res.status(400).json({ message: "Project ID is not correct." });
+            return res.status(400).json({success: false, message: "Project ID is not correct." });
 
         const existingProject = await projectModel.findById(id);
         if(!existingProject)
-            return res.status(400).json({message: "Project is not found."})
+            return res.status(400).json({success: false, message: "Project not found."})
 
         if(description == existingProject.description)
-            return res.status(400).json({message: "Nothing to update!"});
+            return res.status(400).json({success: false, message: "Nothing to update!"});
 
         existingProject.description = description;
         await existingProject.save();
-        return res.send(existingProject);
+        return res.json({
+            success: true,
+            data: existingProject,
+            message: "Description updated successfully"
+        });
     }
     catch(err){
-        res.status(500).json({            
+        res.status(500).json({
+            success: false,            
             message:"Something error happened! Can't update description.",
             error: err.message
         });
@@ -145,20 +165,20 @@ export const addImage = async(req, res)=>{
     //if req.file is not given, then using multer image is not uploaded, so no need to unlink file if returning before saving doc
     const image = req.file;
     if(!image)
-        return res.json({message: "Image is not given to add."});
+        return res.status(400).json({success: false, message: "Image is not given to add."});
     let uploadedImage = null;
     
     try{
         const id = req.params.id;
         if(!id || !mongoose.Types.ObjectId.isValid(id)){
             await fs.unlink(image.path);
-            return res.status(500).json({message: "Project ID is not correct."});
+            return res.status(400).json({success: false, message: "Project ID is not correct."});
         }
 
         const existingProject = await projectModel.findById(id);
         if(!existingProject){
             await fs.unlink(image.path);
-            return res.status(400).json({message: "Project is not found."})
+            return res.status(400).json({success: false, message: "Project not found."})
         }
 
         //if error occurs here, then no need to delete image from cloudinary, as that will not be uploaded yet
@@ -172,7 +192,11 @@ export const addImage = async(req, res)=>{
         await fs.unlink(image.path);
         await existingProject.save();
 
-        return res.send(existingProject)
+        return res.status(200).json({
+            success: true,
+            data: existingProject,
+            message: "Image added successfully"
+        })
     }
     catch(err){
         let errorMessage = err.message;
@@ -185,7 +209,8 @@ export const addImage = async(req, res)=>{
         catch(err){
             errorMessage = `${errorMessage} -  CleanUpError: ${err.message}`
         }
-        return res.status(500).json({            
+        return res.status(500).json({    
+            success: false,        
             message:"Something error happened! Can't add image",
             error: errorMessage
         });
@@ -196,15 +221,15 @@ export const deleteImage = async(req, res)=>{
     try{
         const id = req.params.id;
         if(!id || !mongoose.Types.ObjectId.isValid(id))
-            return res.status(400).json({ message: "Project ID is not correct." });
+            return res.status(400).json({success: false, message: "Project ID is not correct." });
         
         const {image_id} = req.body;//getting public_id of particular image to delete
         if(!image_id)
-            return res.status(400).json({ message: "All fields are required." });
+            return res.status(400).json({success: false, message: "All fields are required." });
 
         const existingProject = await projectModel.findById(id);
         if(!existingProject)
-            return res.status(400).json({message: "Project is not found."})
+            return res.status(400).json({success: false, message: "Project not found."})
 
         // stored the original array of images for backup
         const originalImageArray = existingProject.images;
@@ -224,16 +249,22 @@ export const deleteImage = async(req, res)=>{
             existingProject.images = originalImageArray;      
             //if error doesn't occur in above save then here also, will not  
             await existingProject.save();
-            return res.status(500).json({            
+            return res.status(500).json({ 
+                success: false,           
                 message:"Something error happened! Can't delete image",
                 error: err.message
             });
         }
 
-        return res.send(existingProject);
+        return res.status(200).json({
+            success: true,
+            data: existingProject,
+            message: "Image deleted successfully"
+        });
     }
     catch(err){
-        return res.status(500).json({            
+        return res.status(500).json({  
+            success: false,          
             message:"Something error happened! Can't delete image",
             error: err.message
         });
@@ -245,23 +276,23 @@ export const addVideo = async (req, res)=>{
     try{
         const video = req.file;
         if(!video)
-            return res.status(400).json({message:"video is not given to add."})
+            return res.status(400).json({success: false, message:"video is not given to add."})
         
         const id = req.params.id;
         if(!id || !mongoose.Types.ObjectId.isValid(id)){
             await fs.unlink(video.path);
-            return res.status(400).json({ message: "Project ID is not correct." });
+            return res.status(400).json({success: false, message: "Project ID is not correct." });
         }
 
         const existingProject = await projectModel.findById(id);
         if(!existingProject){
             await fs.unlink(video.path);
-            return res.status(400).json({message: "Project is not found."})
+            return res.status(400).json({success: false, message: "Project not found."})
         }
 
         if(existingProject.video){
             await fs.unlink(video.path);
-            return res.status(400).json({message: "Cannot add more than one video."})
+            return res.status(400).json({success: false, message: "Cannot add more than one video."})
         }
         
         uploadedVideo = await videoUpload(video.path);
@@ -272,7 +303,11 @@ export const addVideo = async (req, res)=>{
         await existingProject.save();
         await fs.unlink(video.path);
 
-        return res.send(existingProject);
+        return res.status(200).json({
+            success: true,
+            data: existingProject,
+            message: "Video added successfully"
+        });
     }
     catch(err){
         let errorMessage = err.message;
@@ -286,6 +321,7 @@ export const addVideo = async (req, res)=>{
             errorMessage = `${errorMessage} -  CleanUpError: ${err.message}`
         }
         return res.status(500).json({
+            success: false,
             message:"Something error happened! Can't add video",
             error: errorMessage
         });
@@ -296,15 +332,15 @@ export const deleteVideo = async(req, res)=>{
     try{
         const id = req.params.id;
         if(!id || !mongoose.Types.ObjectId.isValid(id))
-            return res.status(400).json({ message: "Project ID is not correct." });
+            return res.status(400).json({success: false, message: "Project ID is not correct." });
 
         const {video_id} = req.body;
         if(!video_id)
-            return res.status(400).json({ message: "All fields are required." });
+            return res.status(400).json({success: false, message: "All fields are required." });
 
         const existingProject = await projectModel.findById(id);
         if(!existingProject)
-            return res.status(400).json({ message: "Project is not found." });
+            return res.status(400).json({success: false, message: "Project not found." });
 
         //for backup
         let originalVideo = existingProject.video;
@@ -323,15 +359,21 @@ export const deleteVideo = async(req, res)=>{
             await existingProject.save();
 
             return res.status(500).json({
+                success: false,
                 message:"Something error happened! Can't delete video from server.",
                 error: err.message
             });
         }
 
-        return res.send(existingProject);
+        return res.status(200).json({
+            success: true,
+            data: existingProject,
+            message: "Video deleted successfully"
+        });
     }
     catch(err){
         return res.status(500).json({
+            success: false,
             message:"Something error happened! Can't delete video.",
             error: err.message
         });
@@ -344,11 +386,11 @@ export const deleteProject = async (req, res)=>{
     try{
         const id = req.params.id;
         if(!id || !mongoose.Types.ObjectId.isValid(id))
-            return res.status(400).json({ message: "Project ID is not correct." });
+            return res.status(400).json({success: false, message: "Project ID is not correct." });
 
         const existingProject = await projectModel.findById(id);
         if(!existingProject)
-            return res.status(400).json({ message: "Project is not found." });
+            return res.status(400).json({success: false, message: "Project not found." });
        
         if(existingProject.video)
             await videoDelete(existingProject.video_id);
@@ -359,17 +401,22 @@ export const deleteProject = async (req, res)=>{
             }
             catch(err){
                 await existingProject.deleteOne();
-                res.status(500).json({            
+                return res.status(200).json({ 
+                    success: true,           
                     message:"Project deleted but images can't delete from server",
                     error: err.message
                 });
             }
         
         await existingProject.deleteOne();
-        res.status(200).json({ message: "Project deleted successfully." });
+        res.status(200).json({
+            success: true,
+            message: "Project deleted successfully.",
+        });
     }
     catch(err){
-        res.status(500).json({            
+        res.status(500).json({        
+            success: false,    
             message:"Something error happened! Can't delete project",
             error: err.message
         });
