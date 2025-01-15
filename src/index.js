@@ -28,7 +28,7 @@ app.use('/project', projectRoutes);
 app.use('/doc', docRoutes);
 
 app.get('/', (req, res) => {
-  res.send("hello");
+  res.send("Portfolio Website Backend made with Node.js and Express.js.");
 });
 
 // Start the server
