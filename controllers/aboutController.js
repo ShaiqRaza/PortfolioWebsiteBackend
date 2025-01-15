@@ -64,50 +64,44 @@ export const createAbout = async(req, res) => {
     }
 }
 
-export const updateAbout = async(req, res)=>{
+export const updateAvatar = async(req, res)=>{
     let avatar = null;
     try{
-        const {intro, description} = req.body;
         const uploadedFile = req.file;
-        if(!(intro || description || uploadedFile))
-            return res.status(500).json({message: "Nothing to update!"});
+        if(!uploadedFile)
+            return res.status(400).json({success: false, message: "Nothing to update!"});
         
         const prevAbout = await aboutModel.findOne();
         if(!prevAbout){
-            if(uploadedFile)
-                await fs.unlink(uploadedFile.path);
-            return res.status(500).json({ message: "About section is not created yet"})
-        }
-
-        if((intro == prevAbout.intro || !intro) && (description == prevAbout.description || !description) && (!uploadedFile))
-            return res.json({message: "Nothing to update!"});
-
-        if(intro != prevAbout.intro && intro) prevAbout.intro = intro;
-        if(description != prevAbout.description && description) prevAbout.description = description;
-        if( uploadedFile ){
-            avatar = await imageUpload(uploadedFile.path);
-            prevAbout.avatar = avatar.secure_url;
-            prevAbout.avatar_id = avatar.public_id;
-            
             await fs.unlink(uploadedFile.path);
+            return res.status(400).json({success: false, message: "About section is not created yet."})
         }
         
-        await prevAbout.save();
+        const prevAvatarId = prevAbout.avatar_id;
 
-        if(prevAbout.avatar_id && uploadedFile)
-            try{
-                await imageDelete(prevAbout.avatar_id);
-            }
-            catch(err){
-                return res.status(500).json({ 
-                    data: prevAbout,
-                    message: "About updated but previous avatar can't delete from server."
-                });
-            }
+        avatar = await imageUpload(uploadedFile.path);        
+               
+        prevAbout.avatar = avatar.secure_url;
+        prevAbout.avatar_id = avatar.public_id;        
+        await prevAbout.save();
+        
+        await fs.unlink(uploadedFile.path);
+
+        try{
+            await imageDelete(prevAvatarId);
+        }
+        catch(err){
+            return res.status(500).json({
+                success: false,  
+                data: prevAbout,
+                message: "Avatar updated but previous avatar can't delete from server."
+            });
+        }
 
         return res.status(200).json({
+            success: true, 
             data: prevAbout,
-            message: "About updated successfully."
+            message: "Avatar updated successfully."
         });
     }
     catch(err){
@@ -116,14 +110,14 @@ export const updateAbout = async(req, res)=>{
             if(avatar)
                 //delete uploaded image
                 await imageDelete(avatar.public_id);
-            if(req.file)
-                await fs.unlink(req.file.path);
+            await fs.unlink(req.file.path);
         }
         catch(err){
             errorMessage = `${errorMessage} -  CleanUpError: ${err.message}`
         }
         res.status(500).json({ 
-            message: "An error occurred while updating the about.",
+            success: false, 
+            message: "An error occurred while updating the avatar.",
             error: errorMessage
         });
     }
