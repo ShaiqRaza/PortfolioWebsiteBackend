@@ -129,6 +129,38 @@ export const updateAbout = async(req, res)=>{
     }
 }
 
+
+
+export const updateDescription = async(req, res)=>{
+    try{
+        const {description} = req.body;
+        if(!description)
+            return res.status(400).json({success: false, message: "Nothing to update!"});
+        
+        const about = await findOne();
+        if(!about)
+            return res.status(400).json({success: false, message: "About section is not created yet."});
+
+        if(description == about.description)
+            return res.status(400).json({success: false, message: "Nothing to update!"});
+
+        about.description = description;
+        await about.save();
+        return res.json({
+            success: true,
+            data: about,
+            message: "Description updated successfully."
+        });
+    }
+    catch(err){
+        res.status(500).json({
+            success: false,            
+            message:"Something error happened! Can't update description.",
+            error: err.message
+        });
+    }
+}
+
 export const getAbout = async(req, res)=>{
     try{
         const about = await aboutModel.findOne();
