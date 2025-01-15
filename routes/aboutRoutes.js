@@ -1,11 +1,13 @@
-import { createAbout, updateAbout, getAbout } from "../controllers/aboutController.js";
+import { createAbout, updateAvatar, updateIntro, updateDescription, getAbout } from "../controllers/aboutController.js";
 import { isLoggedin } from "../middlewares/isLoggedin.js";
 import upload from '../config/multerConfig.js'
 import express from 'express'
 const router = express.Router();
 
 router.post('/create', upload.single('avatar'), createAbout);
-router.post('/update', upload.single('avatar'), updateAbout);
+router.post('/update-intro', upload.single('avatar'), updateIntro);
+router.post('/update-avatar', upload.single('avatar'), updateAvatar);
+router.post('/update-description', upload.single('avatar'), updateDescription);
 router.get('/get', getAbout);
 
 export default router;
