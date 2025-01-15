@@ -13,19 +13,19 @@ export const createAbout = async(req, res) => {
         if (!(intro && description && uploadedFile)){
             if(uploadedFile)
                 await fs.unlink(uploadedFile.path);
-            return res.status(400).json({ message: "All fields are required." });
+            return res.status(400).json({success: false, message: "All fields are required." });
         }
 
         if (process.env.NODE_ENV == 'production'){
             await fs.unlink(uploadedFile.path);
-            return res.status(400).json({ message: "You are not allowed to create about." });
+            return res.status(400).json({success: false, message: "You are not allowed to create about." });
         }
 
         const existingAbout = await aboutModel.find();
 
         if (existingAbout.length > 0){
             await fs.unlink(uploadedFile.path);
-            return res.status(400).json({ message: "About already exists" });
+            return res.status(400).json({success: false, message: "About already exists" });
         }
 
         //image upload to cloudinary
@@ -39,7 +39,11 @@ export const createAbout = async(req, res) => {
         });
 
         await fs.unlink(uploadedFile.path);
-        res.status(201).send(newAbout);       
+        res.status(200).json({
+            success: true,
+            data: newAbout,
+            message: "About created successfully."
+        });       
 
     } catch (err) {
         let errorMessage = err.message;
@@ -53,6 +57,7 @@ export const createAbout = async(req, res) => {
             errorMessage = `${errorMessage} -  CleanUpError: ${err.message}`
         }
         res.status(500).json({ 
+            success: false,
             message: "An error occurred while creating the about.",
             error: errorMessage 
         });
@@ -128,11 +133,16 @@ export const getAbout = async(req, res)=>{
     try{
         const about = await aboutModel.findOne();
         if(!about)
-            return res.status(500).json({ message: "About section is empty yet!"})
-        return res.send(about)
+            return res.status(400).json({success: false, message: "About section is empty yet!"})
+        return res.status(200).json({
+            success: true,
+            data: about,
+            message: "About data sent successfuly."
+        })
     }
     catch(err){
         res.status(500).json({ 
+            success: false,
             message: "An error occurred while getting the about.",
             error: err.message 
         });
