@@ -10,16 +10,18 @@ export const createAbout = async(req, res) => {
         const uploadedFile = req.file ? req.file : null;
         const { intro, description } = req.body;
 
+        if (process.env.NODE_ENV == 'production'){
+            if(uploadedFile)
+                await fs.unlink(uploadedFile.path);
+            return res.status(400).json({success: false, message: "You are not allowed to create about." });
+        }
+
         if (!(intro && description && uploadedFile)){
             if(uploadedFile)
                 await fs.unlink(uploadedFile.path);
             return res.status(400).json({success: false, message: "All fields are required." });
         }
 
-        if (process.env.NODE_ENV == 'production'){
-            await fs.unlink(uploadedFile.path);
-            return res.status(400).json({success: false, message: "You are not allowed to create about." });
-        }
 
         const existingAbout = await aboutModel.find();
 
