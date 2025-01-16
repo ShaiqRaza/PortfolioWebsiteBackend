@@ -2,7 +2,24 @@ import docModel from "../models/docModel.js";
 import mongoose from "mongoose";
 import { imageDelete, imageUpload } from "../utils/uploadHandlers.js";
 import fs from 'fs/promises'
-import { execSync } from "child_process";
+
+export const getAllDocs = async(req, res)=>{
+    try{
+        const docs = await docModel.find();
+        return res.status(200).json({
+            success: true,
+            data: docs,
+            message: "Documens sent successfully."
+        })
+    }
+    catch(err){
+        res.status(500).json({
+            success: false,
+            error: err.message,
+            message: "Something error occured! Can't get all documents."
+        })
+    }
+}
 
 export const createDoc = async(req, res)=>{
     let uploadedImage = null;
