@@ -19,6 +19,7 @@ import authRoutes from '../routes/authRoutes.js'
 import adminRoutes from '../routes/adminRoutes.js'
 import projectRoutes from '../routes/projectRoutes.js'
 import docRoutes from '../routes/docRoutes.js'
+import contactRoutes from '../routes/contactRoutes.js'
 
 app.use('/skills', skillRoutes);
 app.use('/about', aboutRoutes);
@@ -26,6 +27,7 @@ app.use('/auth', authRoutes);
 app.use('/admin', adminRoutes);
 app.use('/project', projectRoutes);
 app.use('/doc', docRoutes);
+app.use('/contact', contactRoutes);
 
 app.get('/', (req, res) => {
   res.send("Portfolio Website Backend made with Node.js and Express.js.");
