@@ -9,7 +9,7 @@ export const getAllDocs = async(req, res)=>{
         return res.status(200).json({
             success: true,
             data: docs,
-            message: "Documens sent successfully."
+            message: "Documents sent successfully."
         })
     }
     catch(err){
@@ -18,6 +18,34 @@ export const getAllDocs = async(req, res)=>{
             error: err.message,
             message: "Something error occured! Can't get all documents."
         })
+    }
+}
+
+export const removeDescription = async()=>{
+    try{
+        const id = req.params.id;
+        if(!id || !mongoose.Types.ObjectId.isValid(id))
+            return res.status(400).json({success: false, message: "Document ID is not correct." });
+
+        const existingDoc = await docModel.findById(id);
+        if(!existingDoc)
+            return res.status(400).json({success: false, message: "Document not found."})
+
+        existingDoc.description = null;
+        await existingDoc.save();
+
+        return res.status(200).json({
+            success: true,
+            data: existingDoc,
+            message: "Description removed successfully."
+        });
+    }
+    catch(err){
+        res.status(500).json({   
+            success: false,         
+            message:"Something error happened! Can't remove description.",
+            error: err.message
+        });
     }
 }
 
