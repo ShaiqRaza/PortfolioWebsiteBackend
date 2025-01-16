@@ -21,7 +21,7 @@ import projectRoutes from '../routes/projectRoutes.js'
 import docRoutes from '../routes/docRoutes.js'
 import contactRoutes from '../routes/contactRoutes.js'
 
-app.use('/skills', skillRoutes);
+app.use('/skill', skillRoutes);
 app.use('/about', aboutRoutes);
 app.use('/auth', authRoutes);
 app.use('/admin', adminRoutes);
