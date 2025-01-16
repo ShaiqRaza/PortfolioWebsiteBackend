@@ -21,7 +21,7 @@ export const getAllDocs = async(req, res)=>{
     }
 }
 
-export const removeDescription = async()=>{
+export const removeDescription = async(req, res)=>{
     try{
         const id = req.params.id;
         if(!id || !mongoose.Types.ObjectId.isValid(id))
