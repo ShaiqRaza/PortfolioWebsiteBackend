@@ -224,3 +224,32 @@ export const updateImage = async(req, res)=>{
         })
     }
 }
+
+//need transaction kind of concept in mongoose to handle all edge case errors
+// so will this update in future
+export const deleteDoc = async(req, res)=>{
+    try{
+        const id = req.params.id;
+        if(!id || !mongoose.Types.ObjectId.isValid(id))
+            return res.status(400).json({success: false, message: "Document ID is not correct." });
+
+        const existingDoc = await docModel.findById(id);
+        if(!existingDoc)
+            return res.status(400).json({success: false, message: "Document not found."});
+
+        await existingDoc.remove();
+        await imageDelete(existingDoc.image_id);
+
+        return res.status(200).json({
+            success: true,
+            message: "Document deleted successfully."
+        });
+    }
+    catch(err){
+        res.status(500).json({   
+            success: false,         
+            message:"Something error happened! Can't delete document.",
+            error: err.message
+        });
+    }
+}
