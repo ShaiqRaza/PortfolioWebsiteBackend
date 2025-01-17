@@ -22,6 +22,8 @@ To run this project, you will need to add the following environment variables to
 - `CLOUDINARY_API_KEY`: Can get this from cloudinary account
 - `CLOUDINARY_SECRET`: Can get this from cloudinary account
 
+**Note:** Cloudinary is a service providing cloud storage for images and videos. It is used in this project to store images and videos. For more information, visit [Cloudinary](https://cloudinary.com/).
+
 ## Installation
 
 1. Clone the repository:
