@@ -392,6 +392,8 @@ export const deleteProject = async (req, res)=>{
         if(!existingProject)
             return res.status(400).json({success: false, message: "Project not found." });
        
+        await existingProject.deleteOne();
+        
         if(existingProject.video)
             await videoDelete(existingProject.video_id);
         
@@ -408,7 +410,6 @@ export const deleteProject = async (req, res)=>{
                 });
             }
         
-        await existingProject.deleteOne();
         res.status(200).json({
             success: true,
             message: "Project deleted successfully.",
