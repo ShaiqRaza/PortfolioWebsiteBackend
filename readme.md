@@ -22,7 +22,7 @@ To run this project, you will need to add the following environment variables to
 - `CLOUDINARY_API_KEY`: Can get this from cloudinary account
 - `CLOUDINARY_SECRET`: Can get this from cloudinary account
 
-**Note:** Cloudinary is a service providing cloud storage for images and videos. It is used in this project to store images and videos. For more information, visit [Cloudinary](https://cloudinary.com/).
+**`Note:`** Cloudinary is a service providing cloud storage for images and videos. It is used in this project to store images and videos. For more information, visit [Cloudinary](https://cloudinary.com/).
 
 ## Installation
 
@@ -54,53 +54,179 @@ To run this project, you will need to add the following environment variables to
 
 - **GET /skill/get-all**: Get all skills
 - **POST /skill/create**: Create a new skill
-- **PUT /skill/:document id**: Update a skill
-- **DELETE /skill/:document id**: Delete a skill
+    - Body: 
+        ```json
+        {
+            "title": "Skill Title",
+            "description": "Skill Description"
+        }
+        ```
+- **POST /skill/:document_id**: Update a skill
+    - Body: 
+        ```json
+        {
+            "title": "Updated Skill Title",
+            "description": "Updated Skill Description"
+        }
+        ```
+- **POST /skill/:document_id**: Delete a skill
 
 ### About
 
 - **GET /about/get**: Get about information
 - **POST /about/create**: Create about information
+    - Body: 
+        ```json
+        {
+            "intro": "Intro Text",
+            "description": "Description Text",
+            "avatar": "Avatar Image File"
+        }
+        ```
 - **POST /about/update-avatar**: Update avatar
+    - Body: 
+        ```json
+        {
+            "avatar": "New Avatar Image File"
+        }
+        ```
 - **POST /about/update-intro**: Update intro
+    - Body: 
+        ```json
+        {
+            "intro": "Updated Intro Text"
+        }
+        ```
 - **POST /about/update-description**: Update description
+    - Body: 
+        ```json
+        {
+            "description": "Updated Description Text"
+        }
+        ```
 - **POST /about/remove-description**: Remove description
 
 ### Authentication
 
 - **POST /auth/logout**: Logout admin
 - **POST /auth/login**: Login admin
+    - Body: 
+        ```json
+        {
+            "email": "admin@example.com",
+            "password": "adminpassword"
+        }
+        ```
 
 ### Admin
 
-- **POST /admin/create**: creates an admin, works only on development environment
-- **POST /admin/update**: Update admin( email, password)
+- **POST /admin/create**: Creates an admin, works only on development environment
+    - Body: 
+        ```json
+        {
+            "email": "admin@example.com",
+            "password": "adminpassword"
+        }
+        ```
+- **POST /admin/update**: Update admin (email, password)
+    - Body: 
+        ```json
+        {
+            "email": "newadmin@example.com",
+            "password": "newadminpassword"
+        }
+        ```
 
 ### Projects
 
 - **GET /project/get-all**: Get all projects
 - **POST /project/create**: Create a new project
-- **POST /project/add-image/:document id**: Add an image at a specific project
-- **POST /project/delete-image/:document id**: Delete an image from a particular project
-- **POST /project/add-video/:document id**: Add a video to a specific project
-- **POST /project/delete-video/:document id**: Delete a video from a particular project
-- **POST /project/delete/:document id**: Delete project
-- **POST /project/update-title/:document id**: Update title of a project
-- **POST /project/update-description/:document id**: Update description of a project
+    - Body: 
+        ```json
+        {
+            "title": "Project Title",
+            "description": "Project Description"
+        }
+        ```
+- **POST /project/add-image/:document_id**: Add an image to a specific project
+    - Body: 
+        ```json
+        {
+            "image": "Image File"
+        }
+        ```
+- **POST /project/delete-image/:document_id**: Delete an image from a particular project
+- **POST /project/add-video/:document_id**: Add a video to a specific project
+    - Body: 
+        ```json
+        {
+            "video": "Video File"
+        }
+        ```
+- **POST /project/delete-video/:document_id**: Delete a video from a particular project
+- **POST /project/delete/:document_id**: Delete project
+- **POST /project/update-title/:document_id**: Update title of a project
+    - Body: 
+        ```json
+        {
+            "title": "Updated Project Title"
+        }
+        ```
+- **POST /project/update-description/:document_id**: Update description of a project
+    - Body: 
+        ```json
+        {
+            "description": "Updated Project Description"
+        }
+        ```
 
 ### Documents
 
 - **GET /doc/get-all**: Get all documents
 - **POST /doc/create**: Create a new document
+    - Body: 
+        ```json
+        {
+            "title": "Document Title",
+            "description": "Document Description",
+            "image": "Document Image File"
+        }
+        ```
 - **POST /docs/update-title/:id**: Update title of a particular document
+    - Body: 
+        ```json
+        {
+            "title": "Updated Document Title"
+        }
+        ```
 - **POST /docs/update-image/:id**: Update image of a particular document
-- **POST /docs/update-description/:id**: Update image of a particular document
+    - Body: 
+        ```json
+        {
+            "image": "New Document Image File"
+        }
+        ```
+- **POST /docs/update-description/:id**: Update description of a particular document
+    - Body: 
+        ```json
+        {
+            "description": "Updated Document Description"
+        }
+        ```
 - **POST /docs/remove-description/:id**: Remove description of a specific document
 - **POST /doc/delete/:id**: Delete a particular document
 
 ### Contact
 
-- **POST /contact/send-email**: Submit a contact form which will be indirectly send as an email
+- **POST /contact/send-email**: Submit a contact form which will be indirectly sent as an email
+    - Body: 
+        ```json
+        {
+            "name": "Your Name",
+            "email": "your.email@example.com",
+            "message": "Your message"
+        }
+        ```
 
 ## Contributing
 
