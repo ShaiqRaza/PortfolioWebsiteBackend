@@ -145,7 +145,9 @@ To run this project, you will need to add the following environment variables to
         ```json
         {
             "title": "Project Title",
-            "description": "Project Description"
+            "description": "Project Description",
+            "images": ["Image File 1", "Image File 2"], //optional
+            "videos": ["Video File 1 only"] //optional
         }
         ```
 - **POST /project/add-image/:document_id**: Add an image to a specific project
@@ -188,7 +190,7 @@ To run this project, you will need to add the following environment variables to
         ```json
         {
             "title": "Document Title",
-            "description": "Document Description",
+            "description": "Document Description", //optional
             "image": "Document Image File"
         }
         ```
@@ -218,7 +220,7 @@ To run this project, you will need to add the following environment variables to
 
 ### **Contact**
 
-- **POST /contact/send-email**: Submit a contact form which will be indirectly sent as an email
+- **POST /contact/send-email**: Submit a contact form which will be indirectly sent as an email to the admin
     - Body: 
         ```json
         {
