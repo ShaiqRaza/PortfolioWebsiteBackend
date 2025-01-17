@@ -50,7 +50,7 @@ To run this project, you will need to add the following environment variables to
 
 ## API Endpoints
 
-### Skills
+### **Skills**
 
 - **GET /skill/get-all**: Get all skills
 - **POST /skill/create**: Create a new skill
@@ -71,7 +71,7 @@ To run this project, you will need to add the following environment variables to
         ```
 - **POST /skill/:document_id**: Delete a skill
 
-### About
+### **About**
 
 - **GET /about/get**: Get about information
 - **POST /about/create**: Create about information
@@ -106,7 +106,7 @@ To run this project, you will need to add the following environment variables to
         ```
 - **POST /about/remove-description**: Remove description
 
-### Authentication
+### **Authentication**
 
 - **POST /auth/logout**: Logout admin
 - **POST /auth/login**: Login admin
@@ -118,7 +118,7 @@ To run this project, you will need to add the following environment variables to
         }
         ```
 
-### Admin
+### **Admin**
 
 - **POST /admin/create**: Creates an admin, works only on development environment
     - Body: 
@@ -137,7 +137,7 @@ To run this project, you will need to add the following environment variables to
         }
         ```
 
-### Projects
+### **Projects**
 
 - **GET /project/get-all**: Get all projects
 - **POST /project/create**: Create a new project
@@ -180,7 +180,7 @@ To run this project, you will need to add the following environment variables to
         }
         ```
 
-### Documents
+### **Documents**
 
 - **GET /doc/get-all**: Get all documents
 - **POST /doc/create**: Create a new document
@@ -216,7 +216,7 @@ To run this project, you will need to add the following environment variables to
 - **POST /docs/remove-description/:id**: Remove description of a specific document
 - **POST /doc/delete/:id**: Delete a particular document
 
-### Contact
+### **Contact**
 
 - **POST /contact/send-email**: Submit a contact form which will be indirectly sent as an email
     - Body: 
