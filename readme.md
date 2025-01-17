@@ -4,35 +4,34 @@ This is a backend for a portfolio website, built with Node.js and Express.js. It
 
 ## Features
 
-- Manage skills
+- Admin auth
+- Contact form
 - Manage about section
-- User authentication
-- Admin routes
+- Manage skills
 - Manage projects
 - Manage documents
-- Contact form
 
 ## Environment Variables
 
 To run this project, you will need to add the following environment variables to your `.env` file:
 
-- `DB_URI`: MongoDB connection string
+- `DB_URI`: MongoDB connection string deployed on any cloud platform like MongoDB Atlas
 - `JWT_SECRET`: Secret key for JWT authentication
 - `NODE_ENV`: Environment (development or production)
-- `CLOUDINARY_CLOUD_NAME`: Cloudinary cloud name for image uploads
-- `CLOUDINARY_API_KEY`: Cloudinary API key
-- `CLOUDINARY_SECRET`: Cloudinary API secret
+- `CLOUDINARY_CLOUD_NAME`: Can get this from cloudinary account
+- `CLOUDINARY_API_KEY`: Can get this from cloudinary account
+- `CLOUDINARY_SECRET`: Can get this from cloudinary account
 
 ## Installation
 
 1. Clone the repository:
     ```bash
-    git clone https://github.com/yourusername/portfolio-backend.git
+    git clone https://github.com/ShaiqRaza/PortfolioWebsiteBackend
     ```
 
 2. Navigate to the project directory:
     ```bash
-    cd portfolio-backend
+    cd PortfolioWebsiteBackend
     ```
 
 3. Install dependencies:
