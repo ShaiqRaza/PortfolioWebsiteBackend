@@ -50,42 +50,51 @@ To run this project, you will need to add the following environment variables to
 
 ### Skills
 
-- **GET /skills**: Get all skills
-- **POST /skills**: Create a new skill
-- **PUT /skills/:id**: Update a skill
-- **DELETE /skills/:id**: Delete a skill
+- **GET /skill/get-all**: Get all skills
+- **POST /skill/create**: Create a new skill
+- **PUT /skill/:document id**: Update a skill
+- **DELETE /skill/:document id**: Delete a skill
 
 ### About
 
-- **GET /about**: Get about information
-- **POST /about**: Create about information
-- **PUT /about/avatar**: Update avatar
-- **PUT /about/intro**: Update intro
-- **PUT /about/description**: Update description
+- **GET /about/get**: Get about information
+- **POST /about/create**: Create about information
+- **POST /about/update-avatar**: Update avatar
+- **POST /about/update-intro**: Update intro
+- **POST /about/update-description**: Update description
+- **POST /about/remove-description**: Remove description
 
 ### Authentication
 
-- **POST /auth/register**: Register a new user
-- **POST /auth/login**: Login a user
+- **POST /auth/logout**: Logout admin
+- **POST /auth/login**: Login admin
 
 ### Admin
 
-- **GET /admin/users**: Get all users (admin only)
-- **DELETE /admin/users/:id**: Delete a user (admin only)
+- **POST /admin/create**: creates an admin, works only on development environment
+- **POST /admin/update**: Update admin( email, password)
 
 ### Projects
 
-- **GET /projects**: Get all projects
-- **POST /projects**: Create a new project
-- **PUT /projects/:id**: Update a project
-- **DELETE /projects/:id**: Delete a project
+- **GET /project/get-all**: Get all projects
+- **POST /project/create**: Create a new project
+- **POST /project/add-image/:document id**: Add an image at a specific project
+- **POST /project/delete-image/:document id**: Delete an image from a particular project
+- **POST /project/add-video/:document id**: Add a video to a specific project
+- **POST /project/delete-video/:document id**: Delete a video from a particular project
+- **POST /project/delete/:document id**: Delete project
+- **POST /project/update-title/:document id**: Update title of a project
+- **POST /project/update-description/:document id**: Update description of a project
 
 ### Documents
 
-- **GET /docs**: Get all documents
-- **POST /docs**: Create a new document
-- **PUT /docs/:id**: Update a document
-- **DELETE /docs/:id**: Delete a document
+- **GET /doc/get-all**: Get all documents
+- **POST /doc/create**: Create a new document
+- **POST /docs/update-title/:id**: Update title of a particular document
+- **POST /docs/update-image/:id**: Update image of a particular document
+- **POST /docs/update-description/:id**: Update image of a particular document
+- **POST /docs/remove-description/:id**: Remove description of a specific document
+- **POST /doc/:id**: Delete a particular document
 
 ### Contact
 
