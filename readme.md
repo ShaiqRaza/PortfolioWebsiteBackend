@@ -94,11 +94,11 @@ To run this project, you will need to add the following environment variables to
 - **POST /docs/update-image/:id**: Update image of a particular document
 - **POST /docs/update-description/:id**: Update image of a particular document
 - **POST /docs/remove-description/:id**: Remove description of a specific document
-- **POST /doc/:id**: Delete a particular document
+- **POST /doc/delete/:id**: Delete a particular document
 
 ### Contact
 
-- **POST /contact**: Submit a contact form
+- **POST /contact/send-email**: Submit a contact form which will be indirectly send as an email
 
 ## Contributing
 
