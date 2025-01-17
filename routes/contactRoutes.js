@@ -2,30 +2,39 @@ import dotenv from 'dotenv';
 dotenv.config();   
 import express from 'express';
 import nodemailer from 'nodemailer';
+import adminModel from '../models/adminModel.js';
 
 const router = express.Router();   
 
-// Create a Nodemailer transporter object
-let transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',  // SMTP provider details (Gmail in this case)
-    port: 587,               // Port for STARTTLS
-    secure: false,           // Use STARTTLS
-    auth: {
-        user: process.env.EMAIL,  // Your authenticated email address
-        pass: process.env.PASSWORD // Your email password or app-specific password
-    }
-});
-
 // Route to handle the form submission
-router.post('/send-email', (req, res) => {
+router.post('/send-email', async (req, res) => {
     const { email, message, name } = req.body;
     if( !(email && message && name) )
         return res.status(400).json({success: false, message: 'All fields are required.'});
 
+    const admin = await adminModel.findOne()
+    .catch(err=>{
+        return res.status(500).json({success: false, message: "Somehthing error occured in finding admin.", error: err.message});
+    })
+
+    if(!admin)
+        return res.status(400).json({success: false, message: "Admin not found."});
+
+    // Create a Nodemailer transporter object
+    let transporter = nodemailer.createTransport({
+        host: 'smtp.gmail.com',  // SMTP provider details (Gmail in this case)
+        port: 587,               // Port for STARTTLS
+        secure: false,           // Use STARTTLS
+        auth: {
+            user: admin.email,  // Your authenticated email address
+            pass: admin.password // Your email password or app-specific password
+        }
+    });
+
     // Set up email message options
     let mailOptions = {
-        from: process.env.EMAIL,  // This is the actual sender's email (your email)
-        to: process.env.EMAIL,    // You are sending the email to your email address
+        from: admin.email,  // This is the actual sender's email (your email)
+        to: admin.email,    // You are sending the email to your email address
         replyTo: email,                // Reply will go to the user's email
         subject: `${name} contacted from portfolio website.`,
         text: message,
