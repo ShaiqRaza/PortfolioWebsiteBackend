@@ -237,7 +237,7 @@ export const deleteDoc = async(req, res)=>{
         if(!existingDoc)
             return res.status(400).json({success: false, message: "Document not found."});
 
-        await existingDoc.remove();
+        await existingDoc.deleteOne();
         await imageDelete(existingDoc.image_id);
 
         return res.status(200).json({
