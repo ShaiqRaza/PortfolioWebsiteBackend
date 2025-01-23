@@ -42,24 +42,23 @@ export const updateAdmin = async (req, res) =>{
     try{
         //for more security
         const {email, password, currentPassword} = req.body;
-
+        
         if( !((email || password) && currentPassword) )
             return res.status(400).json({success: false, message: "All fields are required"})
         
         const admin = await adminModel.findOne();
         if(!admin)
             return res.status(400).json({success: false, message: "There is no admin yet"})
-    
-        const response = await bcrypt.compare(currentPassword, admin.password);
         
-        if(!response)
+        const decryptedPassword = decrypt(admin.password);
+        
+        if(decryptedPassword != currentPassword)
             return res.status(400).json({success: false, message: "Password is incorrect"})
 
         if(password){
             // comparing new and prev password
-            const decrypted = decrypt(admin.password);
 
-            if((decrypted == password) && (!email || email==admin.email))
+            if((decryptedPassword == password) && (!email || email==admin.email))
                 return res.status(400).json({success: false, message: "Nothing to update"})
             
             const hash = encrypt(password)
