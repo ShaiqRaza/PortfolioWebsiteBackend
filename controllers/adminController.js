@@ -71,8 +71,7 @@ export const updateAdmin = async (req, res) =>{
         //if password is not given then email must be given compulsory as I already checked it
         else if(email==admin.email)
             return res.status(400).json({success: false, message: "Nothing to update"})
-        else
-            admin.email = email;
+        admin.email = email;
     
         await admin.save();
     
