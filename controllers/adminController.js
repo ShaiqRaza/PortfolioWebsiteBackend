@@ -1,7 +1,7 @@
 import dotenv from 'dotenv'
 dotenv.config();
 import adminModel from '../models/adminModel.js';
-import { encrypt, decrypt } from '../utils/encryptionHandlers.js';
+import bcrypt from 'bcrypt'
 
 export const createAdmin = async (req, res) =>{
     try{
@@ -16,7 +16,8 @@ export const createAdmin = async (req, res) =>{
         if(!(email && password))
             return res.status(400).json({success: false, message: "All fields are required"})
 
-        const hash = encrypt(password);
+        const salt = await bcrypt.genSalt(10);
+        const hash = await bcrypt.hash(password, salt);
         
         const admin = await adminModel.create({
             password: hash,
@@ -42,27 +43,30 @@ export const updateAdmin = async (req, res) =>{
     try{
         //for more security
         const {email, password, currentPassword} = req.body;
-        
+
         if( !((email || password) && currentPassword) )
             return res.status(400).json({success: false, message: "All fields are required"})
         
         const admin = await adminModel.findOne();
         if(!admin)
             return res.status(400).json({success: false, message: "There is no admin yet"})
+    
+        const response = await bcrypt.compare(currentPassword, admin.password);
         
-        const decryptedPassword = decrypt(admin.password);
-        
-        if(decryptedPassword != currentPassword)
+        if(!response)
             return res.status(400).json({success: false, message: "Password is incorrect"})
 
         if(password){
             // comparing new and prev password
+            const comparison = await bcrypt.compare(password, admin.password);
 
-            if((decryptedPassword == password) && (!email || email==admin.email))
+            if(comparison && (!email || email==admin.email))
                 return res.status(400).json({success: false, message: "Nothing to update"})
             
-            const hash = encrypt(password)
+            const salt = await bcrypt.genSalt(10);
+            const hash = await bcrypt.hash(password, salt);
             admin.password = hash;
+           
         }
         //if password is not given then email must be given compulsory as I already checked it
         else if(email==admin.email)
