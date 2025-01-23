@@ -1,7 +1,7 @@
 import dotenv from 'dotenv'
 dotenv.config();
 import adminModel from '../models/adminModel.js';
-import bcrypt from 'bcrypt'
+import { encrypt, decrypt } from '../utils/encryptionHandlers.js';
 
 export const createAdmin = async (req, res) =>{
     try{
@@ -16,8 +16,7 @@ export const createAdmin = async (req, res) =>{
         if(!(email && password))
             return res.status(400).json({success: false, message: "All fields are required"})
 
-        const salt = await bcrypt.genSalt(10);
-        const hash = await bcrypt.hash(password, salt);
+        const hash = encrypt(password);
         
         const admin = await adminModel.create({
             password: hash,
@@ -58,15 +57,13 @@ export const updateAdmin = async (req, res) =>{
 
         if(password){
             // comparing new and prev password
-            const comparison = await bcrypt.compare(password, admin.password);
+            const decrypted = decrypt(admin.password);
 
-            if(comparison && (!email || email==admin.email))
+            if((decrypted == password) && (!email || email==admin.email))
                 return res.status(400).json({success: false, message: "Nothing to update"})
             
-            const salt = await bcrypt.genSalt(10);
-            const hash = await bcrypt.hash(password, salt);
+            const hash = encrypt(password)
             admin.password = hash;
-           
         }
         //if password is not given then email must be given compulsory as I already checked it
         else if(email==admin.email)
