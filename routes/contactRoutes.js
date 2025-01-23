@@ -26,15 +26,15 @@ router.post('/send-email', async (req, res) => {
         port: 587,               // Port for STARTTLS
         secure: false,           // Use STARTTLS
         auth: {
-            user: admin.email,  // Your authenticated email address
-            pass: admin.password // Your email password or app-specific password
+            user: process.env.EMAIL,  // Your authenticated email address
+            pass: process.env.PASSWORD // Your email password or app-specific password
         }
     });
 
     // Set up email message options
     let mailOptions = {
-        from: admin.email,  // This is the actual sender's email (your email)
-        to: admin.email,    // You are sending the email to your email address
+        from: process.env.EMAIL,  // This is the actual sender's email (your email)
+        to: process.env.EMAIL,    // You are sending the email to your email address
         replyTo: email,                // Reply will go to the user's email
         subject: `${name} contacted from portfolio website.`,
         text: message,
