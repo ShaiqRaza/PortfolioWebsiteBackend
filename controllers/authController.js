@@ -47,3 +47,31 @@ export const logoutAdmin = async(req, res) => {
         })
     }
 }
+
+export const isLoggedin = async (req, res)=>{
+    try{
+        const authCookie = req.cookies.admin;
+        if(!authCookie)
+            return res.status(504).json({
+            success: false,
+            message: "There is no cookie!",
+        });
+        const decoded = jwt.verify (authCookie, process.env.JWT_SECRET);
+        const admin = await adminModel.findOne({email:decoded.email})
+        if(admin)
+            return res.status(504).json({
+                success: true
+            });
+        return res.status(504).json({
+            success: false,
+            message: "Cookie is not correct!",
+        });
+    }
+    catch(err){
+        res.status(504).json({
+            success: false,
+            message: "Something error occured in cookie getting",
+            error: err.message
+        })
+    }
+}
