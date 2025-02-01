@@ -52,23 +52,23 @@ export const isLoggedIn = async (req, res)=>{
     try{
         const authCookie = req.cookies.admin;
         if(!authCookie)
-            return res.status(504).json({
+            return res.status(400).json({
             success: false,
             message: "There is no cookie!",
         });
         const decoded = jwt.verify (authCookie, process.env.JWT_SECRET);
         const admin = await adminModel.findOne({email:decoded.email})
         if(admin)
-            return res.status(504).json({
+            return res.status(200).json({
                 success: true
             });
-        return res.status(504).json({
+        return res.status(400).json({
             success: false,
             message: "Cookie is not correct!",
         });
     }
     catch(err){
-        res.status(504).json({
+        res.status(500).json({
             success: false,
             message: "Something error occured in cookie getting",
             error: err.message
