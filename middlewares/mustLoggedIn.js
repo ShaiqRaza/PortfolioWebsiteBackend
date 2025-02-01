@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 import adminModel from '../models/adminModel.js';
 
 //see! I'm making this not "is logged in admin" because my backend only have this login feature for admin not for any other personality
-export const isLoggedin = async (req, res, next)=>{
+export const mustLoggedIn = async (req, res, next)=>{
     try{
         const authCookie = req.cookies.admin;
         if(!authCookie)

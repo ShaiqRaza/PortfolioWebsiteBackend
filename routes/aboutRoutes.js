@@ -1,5 +1,5 @@
 import { createAbout, updateAvatar, updateIntro, updateDescription, getAbout } from "../controllers/aboutController.js";
-import { isLoggedin } from "../middlewares/isLoggedin.js";
+import { mustLoggedIn } from "../middlewares/mustLoggedIn.js";
 import upload from '../config/multerConfig.js'
 import express from 'express'
 const router = express.Router();
