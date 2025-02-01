@@ -48,7 +48,7 @@ export const logoutAdmin = async(req, res) => {
     }
 }
 
-export const isLoggedin = async (req, res)=>{
+export const isLoggedIn = async (req, res)=>{
     try{
         const authCookie = req.cookies.admin;
         if(!authCookie)
