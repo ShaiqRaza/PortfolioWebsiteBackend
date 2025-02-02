@@ -52,7 +52,7 @@ export const isLoggedIn = async (req, res)=>{
     try{
         const authCookie = req.cookies.admin;
         if(!authCookie)
-            return res.status(400).json({
+            return res.status(200).json({
             success: false,
             message: "There is no cookie!",
         });
@@ -62,7 +62,7 @@ export const isLoggedIn = async (req, res)=>{
             return res.status(200).json({
                 success: true
             });
-        return res.status(400).json({
+        return res.status(200).json({
             success: false,
             message: "Cookie is not correct!",
         });
