@@ -41,3 +41,27 @@ export const createSocials = async(req, res) =>{
         });
     }
 }
+
+export const updateSocials = async(req, res) => {
+    try
+    {
+        const {instagram, x, facebook, linkedin, phone} = req.body;
+        const existingSocial = await socialModel.findOne();
+        if(!existingSocial)
+            return res.status(404).json({success: false, message: "Can't update socials as they are not created yet!"});
+        if(instagram) existingSocial.instagram = instagram;
+        if(x) existingSocial.x = x;
+        if(facebook) existingSocial.facebook = facebook;
+        if(linkedin) existingSocial.linkedin = linkedin;
+        if(phone) existingSocial.phone = phone;
+        await existingSocial.save();
+        return res.json({success: true, data: existingSocial, message: "Socials updated successfully."});
+    }
+    catch(err){
+        res.status(500).json({ 
+            success: false,
+            message: "An error occurred while updating the socials.",
+            error: err.message
+        });
+    }
+}
