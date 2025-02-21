@@ -3,23 +3,23 @@ import mongoose from 'mongoose'
 const socialSchema = mongoose.Schema({
     instagram: {
         type: String,
-        defeult: "www.instagram.com"
+        default: "www.instagram.com"
     },
     x: {
         type: String,
-        defeult: "www.x.com"
+        default: "www.x.com"
     },
     facebook: {
         type: String,
-        defeult: "www.facebook.com"
+        default: "www.facebook.com"
     },
     linkedin: {
         type: String,
-        defeult: "www.linkedin.com"
+        default: "www.linkedin.com"
     },
     phone: {
         type: String,
-        defeult: "Nope"
+        default: "Nope"
     }
 })
 
