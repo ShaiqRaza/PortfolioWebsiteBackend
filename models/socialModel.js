@@ -16,6 +16,10 @@ const socialSchema = mongoose.Schema({
     linkedin: {
         type: String,
         defeult: "www.linkedin.com"
+    },
+    phone: {
+        type: String,
+        defeult: "Nope"
     }
 })
 
