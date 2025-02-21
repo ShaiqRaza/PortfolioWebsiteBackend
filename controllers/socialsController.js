@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 export const getSocials = async(req, res) =>{
-    await socialModel.find()
+    await socialModel.findOne()
     .then((response)=>{
         res.status(200).json({data:response, success: true});
     })
@@ -16,17 +16,18 @@ export const getSocials = async(req, res) =>{
     })
 }
 
-export const createSocial = async(req, res) =>{
+export const createSocials = async(req, res) =>{
     try{
         if(process.env.NODE_ENV=='production')
             return res.status(400).json({success: false, message: "Request not acceptable in production."});
         const existingSocial = await socialModel.findOne();
         if(existingSocial)
             return res.status(400).json({success: false, message: "Request not acceptable as socials are already created."});
-        const {instagram, x, facebook, phone} = req.body;
+        const {instagram, x, facebook, linkedin, phone} = req.body;
         const socials = await socialModel.create({
             instagram,
             x,
+            linkedin,
             facebook,
             phone
         });
