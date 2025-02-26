@@ -36,7 +36,7 @@ export const loginAdmin = async(req, res) => {
 
 export const logoutAdmin = async(req, res) => {
     try{
-        res.clearCookie('admin', {httpOnly:true});
+        res.clearCookie('admin', {httpOnly: true, path: "/", sameSite: "None", secure: true });
         return res.status(200).json({success: true, message: "Logged out successfully!"})
     }
     catch(err){
