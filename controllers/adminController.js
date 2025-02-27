@@ -42,9 +42,10 @@ export const createAdmin = async (req, res) =>{
 export const updateAdmin = async (req, res) =>{
     try{
         //for more security
-        const {email, password, currentPassword} = req.body;
+        //password is new-password
+        const {password, currentPassword} = req.body;
 
-        if( !((email || password) && currentPassword) )
+        if( !(password && currentPassword) )
             return res.status(400).json({success: false, message: "All fields are required"})
         
         const admin = await adminModel.findOne();
@@ -60,7 +61,7 @@ export const updateAdmin = async (req, res) =>{
             // comparing new and prev password
             const comparison = await bcrypt.compare(password, admin.password);
 
-            if(comparison && (!email || email==admin.email))
+            if(comparison)
                 return res.status(400).json({success: false, message: "Nothing to update"})
             
             const salt = await bcrypt.genSalt(10);
@@ -68,10 +69,6 @@ export const updateAdmin = async (req, res) =>{
             admin.password = hash;
            
         }
-        //if password is not given then email must be given compulsory as I already checked it
-        else if(email==admin.email)
-            return res.status(400).json({success: false, message: "Nothing to update"})
-        admin.email = email;
     
         await admin.save();
     
