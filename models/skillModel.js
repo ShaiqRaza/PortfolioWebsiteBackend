@@ -6,7 +6,6 @@ const skillSchema = mongoose.Schema({
     },
     description: {
         type:String,
-        required: true
     }
 })
 
