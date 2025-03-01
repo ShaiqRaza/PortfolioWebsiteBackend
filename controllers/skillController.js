@@ -1,5 +1,7 @@
 import mongoose from 'mongoose';
 import skillModel from '../models/skillModel.js'
+import { imageUpload, imageDelete } from '../utils/uploadHandlers.js';
+import fs from "fs/promises";
 
 export const getAllSkills = async(req, res) =>{
     await skillModel.find()
@@ -20,28 +22,51 @@ export const getAllSkills = async(req, res) =>{
 }
 
 export const createSkill = async(req, res) =>{
+    let uploadedLogo = null;
+    const {title, description} = req.body;
+    const logo = req.file;
     try{
-        const {title, description} = req.body;
         const existingSkill = await skillModel.findOne({title});
 
-        if(!title)
-            return res.status(400).json({ success: false, message: "Title is compulsory." });
+        if(!(title || logo))
+            return res.status(400).json({ success: false, message: "Title or Logo compulsory." });
 
         if(existingSkill){
             return res.status(400).json({ success: false, message: `${title} skill already exists`});
         }
 
+        if(logo){          
+            uploadedLogo = await imageUpload(logo.path);
+            await fs.unlink(logo.path);
+        }
+
         const newSkill = await skillModel.create({
             title,
             description,
+            logo: uploadedLogo?.secure_url,
+            logo_url: uploadedLogo?.public
         });
-        res.status(200).json({
+
+        return res.status(200).json({
             success: true,
             data:newSkill,
             message: "Skill created successfully"
         });
     }
     catch(err){
+        try{
+            if(logo)
+                await fs.unlink(logo.path);
+            if(uploadedLogo)
+                await imageDelete(uploadedLogo.public_id);
+        }
+        catch(err){
+            return res.status(500).json({ 
+                success: false,
+                message: "An error occurred while deleting the uploaded image.",
+                error: err.message
+            });
+        }
         res.status(500).json({ 
             success: false,
             message: "An error occurred while creating the skill.",

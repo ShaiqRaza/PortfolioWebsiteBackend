@@ -4,6 +4,10 @@ const skillSchema = mongoose.Schema({
         type: String,
         default: ''
     },
+    logo_url:{
+        type: String,
+        default: ''
+    },
     title: {
         type: String,
         default: ''
