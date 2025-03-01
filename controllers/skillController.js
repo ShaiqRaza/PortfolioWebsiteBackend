@@ -28,12 +28,12 @@ export const createSkill = async(req, res) =>{
             return res.status(400).json({ success: false, message: `${title} skill already exists`});
         }
 
-        if(!(title && description))
+        if(!title)
             return res.status(400).json({ success: false, message: "All fields are required." });
 
         const newSkill = await skillModel.create({
             title,
-            description
+            description: description || ''
         });
         res.status(200).json({
             success: true,
