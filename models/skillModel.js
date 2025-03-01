@@ -1,10 +1,10 @@
 import mongoose from 'mongoose'
 const skillSchema = mongoose.Schema({
-    logo:{
+    logo:{//actual url
         type: String,
         default: ''
     },
-    logo_url:{
+    logo_id:{//public_id
         type: String,
         default: ''
     },

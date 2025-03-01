@@ -44,7 +44,7 @@ export const createSkill = async(req, res) =>{
             title,
             description,
             logo: uploadedLogo?.secure_url,
-            logo_url: uploadedLogo?.public
+            logo_id: uploadedLogo?.public_id
         });
 
         return res.status(200).json({
@@ -101,10 +101,10 @@ export const updateSkill = async(req, res) =>{
 
         if(logo){
             uploadedLogo = await imageUpload(logo.path);
-            if(existingSkill.logo_url)
-                await imageDelete(existingSkill.logo_url);
+            if(existingSkill.logo_id)
+                await imageDelete(existingSkill.logo_id);
             existingSkill.logo = uploadedLogo.secure_url;
-            existingSkill.logo_url = uploadedLogo.public_id;
+            existingSkill.logo_id = uploadedLogo.public_id;
             await fs.unlink(logo.path);
         }
 
@@ -155,8 +155,8 @@ export const deleteSkill = async (req, res)=>{
             return res.status(400).json({ success: false, message: "Skill not found." });
         }
 
-        if(skill?.logo_url)
-            await imageDelete(skill.logo_url);
+        if(skill?.logo_id)
+            await imageDelete(skill.logo_id);
 
         await skill.deleteOne();
 
