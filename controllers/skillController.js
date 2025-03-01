@@ -138,22 +138,27 @@ export const updateSkill = async(req, res) =>{
 }
 
 export const deleteSkill = async (req, res)=>{
+    const id = req.params.id;
+    
+    if (!id) {
+        return res.status(400).json({ success: false, message: "Skill ID is required for deletion." });
+    }
+    
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({ success: false, message: "Invalid Skill ID format." });
+    }
+    
     try{
-        const id = req.params.id;
+        const skill = await skillModel.findById(id);
 
-        if (!id) {
-            return res.status(400).json({ success: false, message: "Skill ID is required for deletion." });
-        }
-
-        if (!mongoose.Types.ObjectId.isValid(id)) {
-            return res.status(400).json({ success: false, message: "Invalid Skill ID format." });
-        }
-
-        const deletedSkill = await skillModel.findByIdAndDelete(id);
-
-        if (!deletedSkill) {
+        if (!skill) {
             return res.status(400).json({ success: false, message: "Skill not found." });
         }
+
+        if(skill?.logo_url)
+            await imageDelete(skill.logo_url);
+
+        await skill.deleteOne();
 
         return res.status(200).json({
             success: true,
