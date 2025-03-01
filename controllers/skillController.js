@@ -24,16 +24,16 @@ export const createSkill = async(req, res) =>{
         const {title, description} = req.body;
         const existingSkill = await skillModel.findOne({title});
 
+        if(!title)
+            return res.status(400).json({ success: false, message: "All fields are required." });
+
         if(existingSkill){
             return res.status(400).json({ success: false, message: `${title} skill already exists`});
         }
 
-        if(!title)
-            return res.status(400).json({ success: false, message: "All fields are required." });
-
         const newSkill = await skillModel.create({
             title,
-            description: description || ''
+            description
         });
         res.status(200).json({
             success: true,
