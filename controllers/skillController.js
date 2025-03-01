@@ -76,29 +76,37 @@ export const createSkill = async(req, res) =>{
 }
 
 export const updateSkill = async(req, res) =>{ 
+    const {title, description} = req.body;
+    const logo = req.file;
+    let uploadedLogo = null;
+    const id = req.params.id;
+    
+    if(!id){
+        return res.status(400).json({ success: false, message: "Skill ID is required for updating." });
+    }
+    
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({ success: false, message: "Invalid Skill ID format." });
+    }
+    
     try{
-        const {title, description} = req.body;
-        const id = req.params.id;
-
-        if(!id){
-            return res.status(400).json({ success: false, message: "Skill ID is required for updating." });
-        }
-        
-        if (!mongoose.Types.ObjectId.isValid(id)) {
-            return res.status(400).json({ success: false, message: "Invalid Skill ID format." });
-        }
-        
         const existingSkill = await skillModel.findById(id);
         
         if(!existingSkill){
             return res.status(400).json({ success: false, message: "Skill not found!" });
         }
-        
-        if((!title || title == existingSkill.title) && (!description || description == existingSkill.description))
-            return res.status(400).json({ success: false, message: "Nothing to update." });
 
         if (title) existingSkill.title = title;
         if (description) existingSkill.description = description;
+
+        if(logo){
+            uploadedLogo = await imageUpload(logo.path);
+            if(existingSkill.logo_url)
+                await imageDelete(existingSkill.logo_url);
+            existingSkill.logo = uploadedLogo.secure_url;
+            existingSkill.logo_url = uploadedLogo.public_id;
+            await fs.unlink(logo.path);
+        }
 
         await existingSkill.save();
         return res.status(200).json({
@@ -108,6 +116,19 @@ export const updateSkill = async(req, res) =>{
         });
     }
     catch(err){
+        try{
+            if(logo)
+                await fs.unlink(logo.path);
+            if(uploadedLogo)
+                await imageDelete(uploadedLogo.public_id);
+        }
+        catch(err){
+            return res.status(500).json({ 
+                success: false,
+                message: "An error occurred while deleting the uploaded image.",
+                error: err.message
+            });
+        }
         return res.status(500).json({
             success: false, 
             message: "An error occurred while updating the skill.",

@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.get('/get-all', getAllSkills);
 router.post('/create', upload.single('logo'),  createSkill);
-router.post('/update/:id', updateSkill);
+router.post('/update/:id', upload.single('logo'), updateSkill);
 router.post('/delete/:id', deleteSkill);
 
 export default router;
