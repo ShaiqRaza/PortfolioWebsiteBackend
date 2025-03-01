@@ -1,8 +1,12 @@
 import mongoose from 'mongoose'
 const skillSchema = mongoose.Schema({
+    logo:{
+        type: String,
+        default: ''
+    },
     title: {
         type: String,
-        required: true
+        default: ''
     },
     description: {
         type:String,
