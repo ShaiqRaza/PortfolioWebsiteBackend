@@ -29,7 +29,7 @@ export const createSkill = async(req, res) =>{
         const existingSkill = await skillModel.findOne({title});
 
         if(!(title || logo))
-            return res.status(400).json({ success: false, message: "Title or Logo compulsory." });
+            return res.status(400).json({ success: false, message: "Must add title or logo." });
 
         if(existingSkill){
             return res.status(400).json({ success: false, message: `${title} skill already exists`});
