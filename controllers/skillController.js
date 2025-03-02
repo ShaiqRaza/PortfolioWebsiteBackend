@@ -96,8 +96,8 @@ export const updateSkill = async(req, res) =>{
             return res.status(400).json({ success: false, message: "Skill not found!" });
         }
 
-        if (title) existingSkill.title = title;
-        if (description) existingSkill.description = description;
+        if (title || title=='') existingSkill.title = title;
+        if (description || description=='') existingSkill.description = description;
 
         if(logo){
             uploadedLogo = await imageUpload(logo.path);
