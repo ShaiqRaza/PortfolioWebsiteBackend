@@ -26,14 +26,9 @@ export const createSkill = async(req, res) =>{
     const {title, description} = req.body;
     const logo = req.file;
     try{
-        const existingSkill = await skillModel.findOne({title});
 
         if(!(title || logo))
             return res.status(400).json({ success: false, message: "Must add title or logo." });
-
-        if(existingSkill){
-            return res.status(400).json({ success: false, message: `${title} skill already exists`});
-        }
 
         if(logo){          
             uploadedLogo = await imageUpload(logo.path);
