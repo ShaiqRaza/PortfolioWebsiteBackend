@@ -23,12 +23,12 @@ export const createSocials = async(req, res) =>{
         const existingSocial = await socialModel.findOne();
         if(existingSocial)
             return res.status(400).json({success: false, message: "Request not acceptable as socials are already created."});
-        const {instagram, x, facebook, linkedin, phone} = req.body;
+        const {instagram, x, github, linkedin, phone} = req.body;
         const socials = await socialModel.create({
             instagram,
             x,
             linkedin,
-            facebook,
+            github,
             phone
         });
         res.status(201).json({success: true, data: socials, message: "Socials created successfully."});
