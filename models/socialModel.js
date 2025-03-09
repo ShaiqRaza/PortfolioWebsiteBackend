@@ -11,7 +11,7 @@ const socialSchema = mongoose.Schema({
     },
     github: {
         type: String,
-        default: "www.facebook.com"
+        default: "www.github.com"
     },
     linkedin: {
         type: String,
