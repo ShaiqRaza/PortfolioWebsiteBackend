@@ -9,7 +9,7 @@ const socialSchema = mongoose.Schema({
         type: String,
         default: "www.x.com"
     },
-    facebook: {
+    github: {
         type: String,
         default: "www.facebook.com"
     },
